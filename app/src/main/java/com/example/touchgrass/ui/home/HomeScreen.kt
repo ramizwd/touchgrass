@@ -1,8 +1,11 @@
 package com.example.touchgrass.ui.home
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import com.example.touchgrass.ui.Navigation
 
 /**
  * Stateful Composable which manages state
@@ -19,5 +22,10 @@ fun HomeScreen(navController: NavController) {
 fun HomeScreenBody(
     navController: NavController
 ) {
-    Text(text = "HomeScreen")
+    Column {
+        Text(text = "HomeScreen")
+        Button(onClick = {
+            navController.navigate(Navigation.STEP_COUNTER)
+        }) { Text(text = "STEP COUNTER")}
+    }
 }
