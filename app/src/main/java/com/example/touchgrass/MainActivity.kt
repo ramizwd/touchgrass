@@ -19,17 +19,21 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.touchgrass.ui.Navigation
+import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 
-private const val STEPS_PREFERENCES_NAME = "steps"
 
 class MainActivity : ComponentActivity(), SensorEventListener {
+
     companion object {
         private lateinit var sensorManager: SensorManager
         private var stepCounter: Sensor? = null
+        private const val STEPS_PREFERENCES_NAME = "steps"
+        private const val TYPE_STEP_COUNTER = "StepCounter"
+        private lateinit var stepCounterViewModel: StepCounterViewModel
     }
 
     private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES_NAME)
@@ -37,20 +41,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
-            stepCounter?.also {
-                sensorManager.registerListener(this@MainActivity,
-                    it,
-                    SensorManager.SENSOR_DELAY_FASTEST
-                )
-            }
-        } else {
-            Log.d("TYPE_STEP_COUNTER", "Sensor not found.")
-        }
+        stepCounterViewModel = StepCounterViewModel()
 
         setContent {
             TouchgrassTheme {
@@ -58,7 +49,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Navigation()
+                    Navigation(stepCounterViewModel)
                 }
             }
         }
@@ -66,10 +57,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
-
         event.values.firstOrNull()?.let {
-            Log.d("TYPE_STEP_COUNTER", "Count: $it")
+            Log.d(TYPE_STEP_COUNTER, "Count: $it")
             totalSteps = it
+            stepCounterViewModel.onStepsUpdate(totalSteps)
         }
 
         val lastDeviceBootTimeInMillis = System.currentTimeMillis() - SystemClock.elapsedRealtime()
@@ -78,17 +69,14 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         val actualSensorEventTimeInMillis = lastDeviceBootTimeInMillis + sensorEventTimeInMillis
         val displayDateStr = DateFormat.getDateInstance().format(actualSensorEventTimeInMillis)
-        Log.d("TYPE_STEP_COUNTER", "Sensor triggered at $displayDateStr")
+        Log.d(TYPE_STEP_COUNTER, "Sensor triggered at $displayDateStr")
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, p1: Int) {
-        Log.d("TYPE_STEP_COUNTER", "onAccuracyChanged Sensor: $sensor, Accuracy: $p1")
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
 
     /**
      * DataStore functions for saving TYPE_STEP_COUNTER sensor data
      */
-
     private suspend fun saveData(key: String, value: Float) {
         val dataStoreKey = floatPreferencesKey(key)
         dataStore.edit { steps ->
@@ -104,6 +92,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
+        sensorManager.unregisterListener(this)
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES_NAME, totalSteps)
         }
@@ -111,10 +100,25 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
+            stepCounter?.also {
+                sensorManager.registerListener(this@MainActivity,
+                    it,
+                    SensorManager.SENSOR_DELAY_FASTEST
+                )
+            }
+        } else {
+            Log.d(TYPE_STEP_COUNTER, "Sensor not found.")
+        }
+
         lifecycleScope.launch {
             val savedSteps = loadData(STEPS_PREFERENCES_NAME)
             totalSteps = savedSteps ?: 0f
-            Log.d("TYPE_STEP_COUNTER", "Saved steps: $savedSteps")
+            Log.d(TYPE_STEP_COUNTER, "Saved steps: $savedSteps")
         }
     }
 }
