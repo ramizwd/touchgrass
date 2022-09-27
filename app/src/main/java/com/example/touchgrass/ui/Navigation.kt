@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.touchgrass.ui.home.HomeScreen
 import com.example.touchgrass.ui.stepcounter.StepCounterScreen
+import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 
 object Navigation {
     const val HOME = "home"
@@ -13,7 +14,9 @@ object Navigation {
 }
 
 @Composable
-fun Navigation() {
+fun Navigation(
+    stepCounterViewModel: StepCounterViewModel
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -27,7 +30,7 @@ fun Navigation() {
         }
         composable(Navigation.STEP_COUNTER) {
             StepCounterScreen(
-                navController = navController
+                viewModel = stepCounterViewModel
             )
         }
     }
