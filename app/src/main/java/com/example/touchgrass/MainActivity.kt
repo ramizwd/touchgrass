@@ -27,6 +27,12 @@ import java.text.DateFormat
 import java.time.LocalDateTime
 
 
+/*
+TODO:
+ - reset counter functionality
+ - Figure out a cleaner way doing the logic inside onSensorChanged
+ - Move sensor to its own class
+ */
 class MainActivity : ComponentActivity(), SensorEventListener {
 
     companion object {
@@ -49,7 +55,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
 
-        /* TODO reset counter functionality
+        /*
         if (stepCounterViewModel.reCounter) {
             previousTotalSteps = totalSteps
             lifecycleScope.launch {
@@ -78,9 +84,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             totalSteps = it
             val currentDayOfWeek = LocalDateTime.now().dayOfWeek.value.toFloat()
 
-            // TODO Figure out a cleaner way
             lifecycleScope.launch {
-
                 val dayOfWeek = loadData(TYPE_STEP_COUNTER_TIME)
                 savedDayOfWeek = dayOfWeek ?: 0f
                 saveData(TYPE_STEP_COUNTER_TIME, currentDayOfWeek)
@@ -94,7 +98,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
                 val currentSteps = totalSteps - previousTotalSteps
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
-
             }
             Log.d(TYPE_STEP_COUNTER, "totalSteps: $totalSteps previous: $previousTotalSteps")
         }
