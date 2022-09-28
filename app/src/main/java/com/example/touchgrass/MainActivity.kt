@@ -24,6 +24,7 @@ import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.DateFormat
+import java.time.LocalDateTime
 
 
 class MainActivity : ComponentActivity(), SensorEventListener {
@@ -31,17 +32,32 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     companion object {
         private lateinit var sensorManager: SensorManager
         private var stepCounter: Sensor? = null
-        private const val STEPS_PREFERENCES_NAME = "steps"
+        private const val STEPS_PREFERENCES = "steps"
         private const val TYPE_STEP_COUNTER = "StepCounter"
+        private const val TYPE_STEP_COUNTER_TIME = "StepCounterTime"
+
         private lateinit var stepCounterViewModel: StepCounterViewModel
     }
 
-    private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES_NAME)
+    private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
     private var totalSteps = 0f
+    private var previousTotalSteps = 0f
+
+    private var savedDayOfWeek = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
+
+        /* TODO reset counter functionality
+        if (stepCounterViewModel.reCounter) {
+            previousTotalSteps = totalSteps
+            lifecycleScope.launch {
+                saveData(STEPS_PREFERENCES, previousTotalSteps)
+            }
+            Log.d("StepCounter", "RESET::::::: ${stepCounterViewModel.reCounter}")
+        }
+         */
 
         setContent {
             TouchgrassTheme {
@@ -60,7 +76,27 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         event.values.firstOrNull()?.let {
             Log.d(TYPE_STEP_COUNTER, "Count: $it")
             totalSteps = it
-            stepCounterViewModel.onStepsUpdate(totalSteps)
+            val currentDayOfWeek = LocalDateTime.now().dayOfWeek.value.toFloat()
+
+            // TODO Figure out a cleaner way
+            lifecycleScope.launch {
+
+                val dayOfWeek = loadData(TYPE_STEP_COUNTER_TIME)
+                savedDayOfWeek = dayOfWeek ?: 0f
+                saveData(TYPE_STEP_COUNTER_TIME, currentDayOfWeek)
+
+                if (currentDayOfWeek != savedDayOfWeek) {
+                    saveData(STEPS_PREFERENCES, totalSteps)
+                }
+
+                val savedSteps = loadData(STEPS_PREFERENCES)
+                previousTotalSteps = savedSteps ?: 0f
+
+                val currentSteps = totalSteps - previousTotalSteps
+                stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
+
+            }
+            Log.d(TYPE_STEP_COUNTER, "totalSteps: $totalSteps previous: $previousTotalSteps")
         }
 
         val lastDeviceBootTimeInMillis = System.currentTimeMillis() - SystemClock.elapsedRealtime()
@@ -92,10 +128,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        sensorManager.unregisterListener(this)
         lifecycleScope.launch {
-            saveData(STEPS_PREFERENCES_NAME, totalSteps)
+            saveData(STEPS_PREFERENCES, previousTotalSteps)
         }
+        sensorManager.unregisterListener(this)
     }
 
     override fun onResume() {
@@ -113,12 +149,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             }
         } else {
             Log.d(TYPE_STEP_COUNTER, "Sensor not found.")
-        }
-
-        lifecycleScope.launch {
-            val savedSteps = loadData(STEPS_PREFERENCES_NAME)
-            totalSteps = savedSteps ?: 0f
-            Log.d(TYPE_STEP_COUNTER, "Saved steps: $savedSteps")
         }
     }
 }

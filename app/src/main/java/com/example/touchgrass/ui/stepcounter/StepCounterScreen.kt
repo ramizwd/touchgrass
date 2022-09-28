@@ -1,6 +1,5 @@
 package com.example.touchgrass.ui.stepcounter
 
-import android.util.Log
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,15 +9,15 @@ import androidx.compose.runtime.livedata.observeAsState
 fun StepCounterScreen(
     viewModel: StepCounterViewModel
 ) {
-    StepCounterScreenBody(viewModel = viewModel)
+    val steps by viewModel.currentSteps.observeAsState()
+
+    StepCounterScreenBody(viewModel = viewModel, steps = steps)
 }
 
 @Composable
 fun StepCounterScreenBody(
     viewModel: StepCounterViewModel,
+    steps: Int?
 ) {
-    val steps by viewModel.steps.observeAsState()
-    Log.d("StepCounter", "HERE: $steps")
-
     Text(text = (steps ?: 0).toString())
 }
