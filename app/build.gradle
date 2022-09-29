@@ -75,8 +75,6 @@ dependencies {
 
     // Coroutine Lifecycle Scopes
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
-    // redundant?
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
 }
