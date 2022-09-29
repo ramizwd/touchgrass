@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.touchgrass.ui.Navigation
+import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
@@ -48,15 +49,20 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val STEPS_TAG = "StepCounter"
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
+
+        private const val HOUR_TIME_PREFERENCES = "HourCounter"
+        private lateinit var homeViewModel: HomeViewModel
     }
 
     private var totalSteps = 0f
     private var previousTotalSteps = 0f
     private var previousDayOfWeek = 0f
+    private var previousHour = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
+        homeViewModel = HomeViewModel()
 
         if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) !=
@@ -73,7 +79,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Navigation(stepCounterViewModel)
+                    Navigation(
+                        stepCounterViewModel,
+                        homeViewModel
+                    )
                 }
             }
         }
@@ -85,11 +94,16 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             Log.d(STEPS_TAG, "Count: $it")
             totalSteps = it
             val currentDayOfWeek = LocalDateTime.now().dayOfWeek.value.toFloat()
+            val currentHour= LocalDateTime.now().hour.toFloat()
 
             lifecycleScope.launch {
+                val savedHour = loadData(HOUR_TIME_PREFERENCES)
+                previousHour = savedHour ?: 0f
+                saveData(HOUR_TIME_PREFERENCES, currentHour)
+                homeViewModel.onHourUpdate(previousHour.toInt())
+
                 val savedDayOfWeek = loadData(STEPS_TIMER_PREFERENCES)
                 previousDayOfWeek = savedDayOfWeek ?: 0f
-
                 saveData(STEPS_TIMER_PREFERENCES, currentDayOfWeek)
 
                 if (currentDayOfWeek != previousDayOfWeek) {
