@@ -23,7 +23,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = Navigation.HYDRATION, // TODO once done with step counter use HOME
+        startDestination = Navigation.HOME,
     ) {
         composable(Navigation.HOME) {
             HomeScreen(
