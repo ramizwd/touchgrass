@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
         }
-        sensorManager.unregisterListener(this@MainActivity)
+//        sensorManager.unregisterListener(this@MainActivity)
     }
 
     override fun onResume() {

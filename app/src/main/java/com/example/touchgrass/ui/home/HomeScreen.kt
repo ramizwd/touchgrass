@@ -26,6 +26,6 @@ fun HomeScreenBody(
         Text(text = "HomeScreen")
         Button(onClick = {
             navController.navigate(Navigation.STEP_COUNTER)
-        }) { Text(text = "STEP COUNTER")}
+        }) { Text(text = "STEP COUNTER") }
     }
 }
