@@ -2,6 +2,7 @@ package com.example.touchgrass.ui.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,8 +24,11 @@ fun HomeScreen(navController: NavController) {
 fun HomeScreenBody(
     navController: NavController
 ) {
-    Column() {
+    Column {
         Text(text = "HomeScreen")
+        Button(onClick = {
+            navController.navigate(Navigation.STEP_COUNTER)
+        }) { Text(text = "STEP COUNTER")}
         Text(
             text = "HydrationScreen",
             modifier = Modifier.selectable(
@@ -32,5 +36,4 @@ fun HomeScreenBody(
                 onClick = { navController.navigate(Navigation.HYDRATION) })
         )
     }
-
 }
