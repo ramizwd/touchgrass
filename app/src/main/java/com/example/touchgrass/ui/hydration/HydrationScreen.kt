@@ -78,7 +78,7 @@ fun HydrationScreenBody(
                     .wrapContentSize(Alignment.TopEnd)
             ) {
                 IconButton(onClick = { onExpanded(true) }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Settings")
+                    Icon(Icons.Default.MoreVert, contentDescription = "WaterAmount")
                 }
                 DropdownMenu(
                     expanded = expanded,
@@ -103,7 +103,8 @@ fun HydrationScreenBody(
             ) {
                 CircularProgressBar(
                     percentage = drankAmount / numberGoal.toFloat(),
-                    number = numberGoal
+                    number = numberGoal,
+                    color = if (drankAmount >= numberGoal) Color.Green else Color.Blue
                 )
             }
         }
