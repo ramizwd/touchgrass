@@ -23,7 +23,7 @@ fun CircularProgressBar(
     percentage: Float,
     number: Int,
     fontSize: TextUnit = 28.sp,
-    radius: Dp = 80.dp,
+    radius: Dp = 100.dp,
     color: Color = Color.Blue,
     strokeWidth: Dp = 14.dp,
     animationDuration: Int = 1000,
@@ -45,16 +45,24 @@ fun CircularProgressBar(
     ) {
         Canvas(modifier = Modifier.size(radius * 2f)) {
             drawArc(
+                color = Color.LightGray,
+                -90f,
+                360f,
+                useCenter = false,
+                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round),
+            )
+            drawArc(
                 color = color,
                 -90f,
                 360 * curPercentage.value,
                 useCenter = false,
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
+
         }
         Text(text = ("${(curPercentage.value * number).toInt()}/$number"),
             color = Color.Black,
             fontSize = fontSize,
-            fontWeight = FontWeight.Bold)
+            fontWeight = FontWeight.Medium)
     }
 }

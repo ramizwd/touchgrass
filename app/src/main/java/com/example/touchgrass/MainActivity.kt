@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             lifecycleScope.launch {
                 val savedDayOfWeek = loadData(STEPS_TIMER_PREFERENCES)
                 previousDayOfWeek = savedDayOfWeek ?: 0f
+
                 saveData(STEPS_TIMER_PREFERENCES, currentDayOfWeek)
 
                 if (currentDayOfWeek != previousDayOfWeek) {
