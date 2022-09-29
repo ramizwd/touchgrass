@@ -21,11 +21,9 @@ class StepCounterViewModel: ViewModel() {
     fun onResetCounter() {
         reCounter = true
     }
-     */
+    */
 
     fun onStepsUpdate(steps: Int) {
         _steps.value = steps
-        Log.d("StepCounter", "$steps")
-
     }
 }
