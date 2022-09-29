@@ -23,7 +23,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = Navigation.HOME, // TODO once done with step counter use HOME
+        startDestination = Navigation.HYDRATION, // TODO once done with step counter use HOME
     ) {
         composable(Navigation.HOME) {
             HomeScreen(
@@ -31,7 +31,7 @@ fun Navigation(
             )
         }
         composable(Navigation.HYDRATION) {
-            HydrationScreen(navController = navController)
+            HydrationScreen()
         }
         composable(Navigation.STEP_COUNTER) {
             StepCounterScreen(
