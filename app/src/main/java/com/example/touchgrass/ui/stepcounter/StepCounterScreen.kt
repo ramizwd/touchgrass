@@ -54,7 +54,7 @@ fun StepCounterScreenBody(
                 CircularProgressBar(
                     percentage = (steps ?: 0) / stepsTarget,
                     number = stepsTarget.toInt(),
-                    color = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Blue
+                    color = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Yellow
                 )
             }
             Box(
