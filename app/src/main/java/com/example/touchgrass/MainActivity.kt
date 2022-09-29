@@ -1,10 +1,13 @@
 package com.example.touchgrass
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -14,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -29,7 +34,7 @@ import java.time.LocalDateTime
 
 /*
 TODO:
- - reset counter functionality
+ - reset counter on press functionality
  - Figure out a cleaner way doing the logic inside onSensorChanged
  - Move sensor to its own class
  */
@@ -43,7 +48,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val STEPS_TAG = "StepCounter"
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
-
     }
 
     private var totalSteps = 0f
@@ -54,15 +58,14 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
 
-        /*
-        if (stepCounterViewModel.reCounter) {
-            previousTotalSteps = totalSteps
-            lifecycleScope.launch {
-                saveData(STEPS_PREFERENCES, previousTotalSteps)
+        if ((ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACTIVITY_RECOGNITION) !=
+                    PackageManager.PERMISSION_GRANTED)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0)
             }
-            Log.d("StepCounter", "RESET::::::: ${stepCounterViewModel.reCounter}")
         }
-         */
 
         setContent {
             TouchgrassTheme {
@@ -133,7 +136,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
         }
-        sensorManager.unregisterListener(this)
+        sensorManager.unregisterListener(this@MainActivity)
     }
 
     override fun onResume() {
