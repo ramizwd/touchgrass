@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">touchgrass</string>
+    <string name="water">How much water have you drank?</string>
 </resources>
