@@ -1,7 +1,6 @@
 package com.example.touchgrass.ui.home
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,14 +12,18 @@ import androidx.navigation.NavController
 import com.example.touchgrass.ui.Navigation
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
 
+object HomeConstants {
+    const val totalMinutes = 1440f
+}
+
 /**
  * Stateful Composable which manages state
  */
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
-    val currentHour by viewModel.currentHour.observeAsState()
+    val currentMinutes by viewModel.currentTotalMinutes.observeAsState()
 
-    HomeScreenBody(navController = navController, currentHour = currentHour)
+    HomeScreenBody(navController = navController, currentMinutes = currentMinutes)
 }
 
 /**
@@ -29,10 +32,9 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 @Composable
 fun HomeScreenBody(
     navController: NavController,
-    currentHour: Int?
+    currentMinutes: Int?
 ) {
 
-    var placeholder = 1
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -47,9 +49,9 @@ fun HomeScreenBody(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularProgressBar(
-                    percentage = (placeholder ?: 0) / 1f,
+                    percentage = (currentMinutes ?: 0) / HomeConstants.totalMinutes,
                     number = 0,
-                    color = if ((placeholder ?: 0) >= placeholder) Color.Red else Color.Black
+                    color = if ((currentMinutes ?: 0) == 0) Color.Red else Color.Black
                 )
             }
         }
