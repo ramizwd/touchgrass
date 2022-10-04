@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.touchgrass.ui.Navigation
+import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
@@ -47,6 +48,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val STEPS_TIMER_PREFERENCES = "StepCounterTime"
         private const val STEPS_TAG = "StepCounter"
         private lateinit var stepCounterViewModel: StepCounterViewModel
+        private lateinit var hydrationViewModel: HydrationViewModel
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
     }
 
@@ -57,13 +59,18 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
-
-        if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACTIVITY_RECOGNITION) !=
-                    PackageManager.PERMISSION_GRANTED)) {
+        hydrationViewModel = HydrationViewModel()
+        if ((ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) !=
+                    PackageManager.PERMISSION_GRANTED)
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0
+                )
             }
         }
 
@@ -73,7 +80,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Navigation(stepCounterViewModel)
+                    Navigation(stepCounterViewModel, hydrationViewModel)
                 }
             }
         }
@@ -136,6 +143,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
+            hydrationViewModel.numberGoal.value?.toFloat()?.let { saveData("TEST", it) }
+            hydrationViewModel.drankAmount.value?.toFloat()?.let { saveData("TEST3", it) }
         }
 //        sensorManager.unregisterListener(this@MainActivity)
     }
@@ -148,13 +157,18 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
             stepCounter?.also {
-                sensorManager.registerListener(this@MainActivity,
+                sensorManager.registerListener(
+                    this@MainActivity,
                     it,
                     SensorManager.SENSOR_DELAY_FASTEST
                 )
             }
         } else {
             Log.d(STEPS_TAG, "Sensor not found.")
+        }
+        lifecycleScope.launch {
+            loadData("TEST")?.let { hydrationViewModel.onNumberGoalUpdate(it.toInt()) }
+            loadData("TEST3")?.let { hydrationViewModel.onDrankAmountUpdate(it.toInt()) }
         }
     }
 }
