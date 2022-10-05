@@ -17,14 +17,18 @@ fun StepCounterScreen(
 ) {
     val steps by viewModel.currentSteps.observeAsState()
     val targetSteps by viewModel.targetStepsIndex.observeAsState()
+    val dayOfWeek by viewModel.dayOfWeek.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
     val targetStepsList = mutableListOf<Int>()
+
+    // for loop too large (slow)
     for (i in 1000..50000 step 1000) targetStepsList.add(i)
     var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
     StepCounterScreenBody(
+        dayOfWeek = dayOfWeek,
         viewModel = viewModel,
         steps = steps,
         stepsTarget = stepsTarget,
@@ -38,6 +42,7 @@ fun StepCounterScreen(
 @Composable
 fun StepCounterScreenBody(
     viewModel: StepCounterViewModel,
+    dayOfWeek: Int?,
     steps: Int?,
     stepsTarget: Float,
     targetStepsList: List<Int>,
@@ -92,7 +97,7 @@ fun StepCounterScreenBody(
                 .weight(1f)
         ) {
             Column {
-                StepCounterGraph()
+                StepCounterGraph(steps, dayOfWeek)
             }
         }
     }

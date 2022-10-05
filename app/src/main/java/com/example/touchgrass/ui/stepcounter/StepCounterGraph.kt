@@ -14,17 +14,25 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 
+/*
+TODO
+  - Update the graph view dynamically
+  - Save entries to DB
+  - Reset graph every week
+ */
 @Composable
-fun StepCounterGraph() {
+fun StepCounterGraph(steps: Int?, dayOfWeek: Int?) {
     val dataSet = remember { mutableStateListOf(
-        BarEntry(1f ,1000f),
-        BarEntry(2f ,50000f),
-        BarEntry(3f ,2400f),
-        BarEntry(4f ,5720f),
-        BarEntry(5f ,42f),
-        BarEntry(6f ,20050f),
-        BarEntry(7f ,5500f)
+        BarEntry(1f ,0f),
+        BarEntry(2f ,0f),
+        BarEntry(3f ,0f),
+        BarEntry(4f ,0f),
+        BarEntry(5f ,0f),
+        BarEntry(6f ,0f),
+        BarEntry(7f ,0f)
     ) }
+    dataSet[(dayOfWeek ?: 0) -1] = BarEntry(dayOfWeek?.toFloat() ?: 0f , steps?.toFloat() ?: 0f)
+    Log.d("GRAPH", "$steps")
 
     AndroidView (
         modifier = Modifier.fillMaxSize(),
@@ -37,11 +45,9 @@ fun StepCounterGraph() {
             desc.text = ""
             view.description = desc
             view.data = barData
-            Log.d("CHART", "${view.data} $barData")
             view
         },
         update = { view ->
-            // Update the view
             view.invalidate()
         }
     )
