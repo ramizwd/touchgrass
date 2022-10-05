@@ -92,14 +92,18 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 val totalMinutesOfDay = ((currentHour * 60) + currentMinute)
                 val currentSteps = totalSteps - previousTotalSteps
 
+                stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
+                Log.d("GRAPH", "HANDLER $currentSteps $totalSteps $previousTotalSteps")
+
+
                 stepCounterViewModel.onDayUpdate(currentDayOfWeek.toInt())
 
-                stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
 
                 if (currentDayOfWeek != previousDayOfWeek) {
                     previousTotalSteps = totalSteps
                     previousDayOfWeek = currentDayOfWeek
+                    Log.d("GRAPH", "HANDLER---- $currentDayOfWeek $previousDayOfWeek $totalSteps $previousTotalSteps")
 
                     lifecycleScope.launch {
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
