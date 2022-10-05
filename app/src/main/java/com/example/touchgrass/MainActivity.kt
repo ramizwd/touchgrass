@@ -10,7 +10,6 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.SystemClock
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,7 +29,6 @@ import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.text.DateFormat
 import java.time.LocalDateTime
 
 class MainActivity : ComponentActivity(), SensorEventListener {
@@ -94,6 +92,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 val totalMinutesOfDay = ((currentHour * 60) + currentMinute)
                 val currentSteps = totalSteps - previousTotalSteps
 
+                stepCounterViewModel.onDayUpdate(currentDayOfWeek.toInt())
+
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
 
@@ -110,6 +110,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         }, 10)
     }
 
+    /* TODO sensor adds on step at each launch WHY??*/
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
         event.values.firstOrNull()?.let {
