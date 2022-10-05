@@ -92,10 +92,12 @@ fun StepCounterScreenBody(
                 .weight(1f)
         ) {
             Column {
-
+                StepCounterGraph()
             }
         }
     }
 }
+
+
 
 

@@ -77,4 +77,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
+
+    // MPAndroidChart Library
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }
