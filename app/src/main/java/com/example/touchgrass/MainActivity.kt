@@ -34,19 +34,13 @@ import java.text.DateFormat
 import java.time.LocalDateTime
 
 
-/*
-TODO:
- - reset counter on press functionality
- - Move sensor to its own class
- - Move Prefs to repo
- */
 class MainActivity : ComponentActivity(), SensorEventListener {
 
     companion object {
         private lateinit var sensorManager: SensorManager
         private var stepCounter: Sensor? = null
 
-        private const val STEPS_TAG = "StepCounter"
+        private const val TAG = "StepCounter"
         private const val STEPS_PREFERENCES = "steps"
         private const val STEPS_DAY_PREFERENCES = "StepCounterTime"
 
@@ -106,6 +100,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 if (currentDayOfWeek != previousDayOfWeek) {
                     previousTotalSteps = totalSteps
                     previousDayOfWeek = currentDayOfWeek
+
+                    lifecycleScope.launch {
+                        saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
+                    }
                 }
 
                 timeHandler.postDelayed(this, 1000)
@@ -116,7 +114,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
         event.values.firstOrNull()?.let {
-            Log.d(STEPS_TAG, "Count: $it")
+            Log.d(TAG, "Count: $it")
             totalSteps = it
         }
 
@@ -126,7 +124,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         val actualSensorEventTimeInMillis = lastDeviceBootTimeInMillis + sensorEventTimeInMillis
         val displayDateStr = DateFormat.getDateInstance().format(actualSensorEventTimeInMillis)
-        Log.d(STEPS_TAG, "Sensor triggered at $displayDateStr")
+        Log.d(TAG, "Sensor triggered at $displayDateStr")
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
@@ -151,7 +149,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
-            saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
         }
 //        sensorManager.unregisterListener(this@MainActivity)
     }
@@ -169,7 +166,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 )
             }
         } else {
-            Log.d(STEPS_TAG, "Sensor not found.")
+            Log.d(TAG, "Sensor not found.")
         }
 
         lifecycleScope.launch {
