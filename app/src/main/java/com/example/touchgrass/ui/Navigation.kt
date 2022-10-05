@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.touchgrass.ui.home.HomeScreen
+import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.hydration.HydrationScreen
 import com.example.touchgrass.ui.stepcounter.StepCounterScreen
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
@@ -17,7 +18,8 @@ object Navigation {
 
 @Composable
 fun Navigation(
-    stepCounterViewModel: StepCounterViewModel
+    stepCounterViewModel: StepCounterViewModel,
+    homeViewModel: HomeViewModel
 ) {
     val navController = rememberNavController()
 
@@ -27,7 +29,8 @@ fun Navigation(
     ) {
         composable(Navigation.HOME) {
             HomeScreen(
-                navController = navController
+                navController = navController,
+                viewModel = homeViewModel
             )
         }
         composable(Navigation.HYDRATION) {
