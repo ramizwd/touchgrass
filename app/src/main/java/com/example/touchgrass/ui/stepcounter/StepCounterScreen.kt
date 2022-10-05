@@ -16,13 +16,16 @@ fun StepCounterScreen(
     viewModel: StepCounterViewModel
 ) {
     val steps by viewModel.currentSteps.observeAsState()
+    val targetSteps by viewModel.targetStepsIndex.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
-    val targetStepsList = listOf(500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000)
-    var selectedIndex by remember { mutableStateOf(0) }
+    val targetStepsList = mutableListOf<Int>()
+    for (i in 1000..50000 step 1000) targetStepsList.add(i)
+    var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
     StepCounterScreenBody(
+        viewModel = viewModel,
         steps = steps,
         stepsTarget = stepsTarget,
         expanded = expanded,
@@ -34,6 +37,7 @@ fun StepCounterScreen(
 
 @Composable
 fun StepCounterScreenBody(
+    viewModel: StepCounterViewModel,
     steps: Int?,
     stepsTarget: Float,
     targetStepsList: List<Int>,
@@ -71,6 +75,7 @@ fun StepCounterScreenBody(
                 ) {
                     targetStepsList.forEachIndexed { index, value ->
                         DropdownMenuItem(onClick = {
+                            viewModel.onTargetStepsIndexUpdate(index.toFloat())
                             onSelectedIndex(index)
                             onExpanded(false)
                         }) {

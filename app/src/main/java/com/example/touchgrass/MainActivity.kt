@@ -33,7 +33,6 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.time.LocalDateTime
 
-
 class MainActivity : ComponentActivity(), SensorEventListener {
 
     companion object {
@@ -43,6 +42,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val TAG = "StepCounter"
         private const val STEPS_PREFERENCES = "steps"
         private const val STEPS_DAY_PREFERENCES = "StepCounterTime"
+        private const val STEPS_TARGET_PREFERENCES = "StepTarget"
 
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
 
@@ -105,7 +105,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
                     }
                 }
-
                 timeHandler.postDelayed(this, 1000)
             }
         }, 10)
@@ -117,14 +116,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             Log.d(TAG, "Count: $it")
             totalSteps = it
         }
-
-        val lastDeviceBootTimeInMillis = System.currentTimeMillis() - SystemClock.elapsedRealtime()
-        val sensorEventTimeInNanos = event.timestamp
-        val sensorEventTimeInMillis = sensorEventTimeInNanos / 1000_000
-
-        val actualSensorEventTimeInMillis = lastDeviceBootTimeInMillis + sensorEventTimeInMillis
-        val displayDateStr = DateFormat.getDateInstance().format(actualSensorEventTimeInMillis)
-        Log.d(TAG, "Sensor triggered at $displayDateStr")
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
@@ -149,8 +140,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
+            stepCounterViewModel.targetStepsIndex.value?.let {
+                saveData(STEPS_TARGET_PREFERENCES, it)
+            }
         }
-//        sensorManager.unregisterListener(this@MainActivity)
     }
 
     override fun onResume() {
@@ -175,6 +168,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
             val savedDayOfWeek = loadData(STEPS_DAY_PREFERENCES)
             previousDayOfWeek = savedDayOfWeek ?: 0f
+
+            loadData(STEPS_TARGET_PREFERENCES)?.let {
+                stepCounterViewModel.onTargetStepsIndexUpdate(it)
+            }
         }
         updateStepsAndTimer()
     }
