@@ -16,7 +16,6 @@ import com.github.mikephil.charting.data.BarEntry
 
 /*
 TODO
-  - Update the graph view dynamically
   - Save entries to DB
   - Reset graph every week
  */
@@ -37,7 +36,9 @@ fun StepCounterGraph(steps: Int?, dayOfWeek: Int?) {
     AndroidView (
         modifier = Modifier.fillMaxSize(),
         factory = { context: Context ->
-            val view = BarChart(context)
+            BarChart(context)
+        },
+        update = { view ->
             view.legend.isEnabled = false
             val data = BarDataSet(dataSet, "STEPS")
             val desc = Description()
@@ -45,9 +46,6 @@ fun StepCounterGraph(steps: Int?, dayOfWeek: Int?) {
             desc.text = ""
             view.description = desc
             view.data = barData
-            view
-        },
-        update = { view ->
             view.invalidate()
         }
     )
