@@ -1,9 +1,5 @@
 package com.example.touchgrass.ui.stepcounter
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,18 +8,21 @@ class StepCounterViewModel: ViewModel() {
     private val _steps: MutableLiveData<Int> = MutableLiveData()
     val currentSteps: LiveData<Int> = _steps
 
-    /* TODO reset counter functionality
-    private val _resetCounter: MutableLiveData<Boolean> = MutableLiveData()
-    val resetCounter: LiveData<Boolean> = _resetCounter
+    private val _targetStepsIndex: MutableLiveData<Float> = MutableLiveData()
+    val targetStepsIndex: LiveData<Float> = _targetStepsIndex
 
-    var reCounter by mutableStateOf(false)
-
-    fun onResetCounter() {
-        reCounter = true
-    }
-    */
+    private val _dayOfWeek: MutableLiveData<Int> = MutableLiveData()
+    val dayOfWeek: LiveData<Int> = _dayOfWeek
 
     fun onStepsUpdate(steps: Int) {
         _steps.value = steps
+    }
+
+    fun onTargetStepsIndexUpdate(targetStepsIndex: Float) {
+        _targetStepsIndex.value = targetStepsIndex
+    }
+
+    fun onDayUpdate(dayOfWeek: Int) {
+        _dayOfWeek.value = dayOfWeek
     }
 }
