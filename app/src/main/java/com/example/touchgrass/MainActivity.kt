@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
         homeViewModel = HomeViewModel()
+        heartRateMonitorViewModel = HeartRateMonitorViewModel()
 
         if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) !=
