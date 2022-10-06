@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.touchgrass.ui.Navigation
+import com.example.touchgrass.ui.heartratemonitor.HeartRateMonitorViewModel
 import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private lateinit var homeViewModel: HomeViewModel
+        private lateinit var heartRateMonitorViewModel: HeartRateMonitorViewModel
     }
 
     private var totalSteps = 0f
@@ -75,7 +77,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 ) {
                     Navigation(
                         stepCounterViewModel,
-                        homeViewModel
+                        homeViewModel,
+                        heartRateMonitorViewModel
                     )
                 }
             }
