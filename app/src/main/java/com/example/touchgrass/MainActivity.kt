@@ -10,7 +10,6 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.SystemClock
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,7 +29,6 @@ import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.text.DateFormat
 import java.time.LocalDateTime
 
 class MainActivity : ComponentActivity(), SensorEventListener {
@@ -41,8 +39,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         private const val TAG = "StepCounter"
         private const val STEPS_PREFERENCES = "steps"
-        private const val STEPS_DAY_PREFERENCES = "StepCounterTime"
-        private const val STEPS_TARGET_PREFERENCES = "StepTarget"
+        private const val STEPS_DAY_PREFERENCES = "step_counter_time"
+        private const val STEPS_TARGET_PREFERENCES = "step_target"
 
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
 
@@ -95,6 +93,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 val currentSteps = totalSteps - previousTotalSteps
 
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
+                stepCounterViewModel.onDayUpdate(currentDayOfWeek.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
 
                 if (currentDayOfWeek != previousDayOfWeek) {
