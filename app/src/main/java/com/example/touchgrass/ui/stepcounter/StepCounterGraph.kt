@@ -1,7 +1,6 @@
 package com.example.touchgrass.ui.stepcounter
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -29,24 +28,29 @@ fun StepCounterGraph(steps: Int?, dayOfWeek: Int?) {
         BarEntry(5f ,0f),
         BarEntry(6f ,0f),
         BarEntry(7f ,0f)
-    ) }
-    dataSet[(dayOfWeek ?: 0) -1] = BarEntry(dayOfWeek?.toFloat() ?: 0f , steps?.toFloat() ?: 0f)
-    Log.d("GRAPH", "$steps")
+    )}
+
+    dayOfWeek?.let {
+        dataSet[dayOfWeek -1] = BarEntry(dayOfWeek.toFloat(), steps?.toFloat() ?: 0f)
+    }
 
     AndroidView (
         modifier = Modifier.fillMaxSize(),
         factory = { context: Context ->
             BarChart(context)
         },
-        update = { view ->
-            view.legend.isEnabled = false
-            val data = BarDataSet(dataSet, "STEPS")
+        update = { barChart ->
+            val barDataSet = BarDataSet(dataSet, "Daily Steps")
             val desc = Description()
-            val barData = BarData(data)
+            val barData = BarData(barDataSet)
             desc.text = ""
-            view.description = desc
-            view.data = barData
-            view.invalidate()
+            barChart.apply {
+                description = desc
+                data = barData
+                axisLeft.granularity = 1f
+                axisRight.granularity = 1f
+                invalidate()
+            }
         }
     )
 }
