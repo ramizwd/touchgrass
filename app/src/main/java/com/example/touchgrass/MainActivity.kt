@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val STEPS_PREFERENCES = "steps"
         private const val STEPS_TIMER_PREFERENCES = "StepCounterTime"
         private const val STEPS_TAG = "StepCounter"
+        private const val DRANK_AMOUNT = "drank_amount"
+        private const val NUMBER_GOAL = "number_goal"
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private lateinit var hydrationViewModel: HydrationViewModel
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
