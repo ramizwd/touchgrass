@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.touchgrass.ui.Navigation
+import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
@@ -41,11 +42,13 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val STEPS_PREFERENCES = "steps"
         private const val STEPS_DAY_PREFERENCES = "step_counter_time"
         private const val STEPS_TARGET_PREFERENCES = "step_target"
-
+        private const val DRANK_AMOUNT = "drank_amount"
+        private const val HYDRATION_TARGET = "number_goal"
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
 
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private lateinit var homeViewModel: HomeViewModel
+        private lateinit var hydrationViewModel: HydrationViewModel
     }
 
     private var totalSteps = 0f
@@ -57,13 +60,19 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
         homeViewModel = HomeViewModel()
+        hydrationViewModel = HydrationViewModel()
 
-        if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACTIVITY_RECOGNITION) !=
-                    PackageManager.PERMISSION_GRANTED)) {
+        if ((ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) !=
+                    PackageManager.PERMISSION_GRANTED)
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0
+                )
             }
         }
 
@@ -73,8 +82,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
+
                     Navigation(
                         stepCounterViewModel,
+                        hydrationViewModel,
                         homeViewModel
                     )
                 }
@@ -99,7 +110,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 if (currentDayOfWeek != previousDayOfWeek) {
                     previousTotalSteps = totalSteps
                     previousDayOfWeek = currentDayOfWeek
-
+                    hydrationViewModel.onDrankAmountUpdate(0)
                     lifecycleScope.launch {
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
                     }
@@ -142,6 +153,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }
+            hydrationViewModel.numberGoal.value?.toFloat()?.let { saveData(HYDRATION_TARGET, it) }
+            hydrationViewModel.drankAmount.value?.toFloat()?.let { saveData(DRANK_AMOUNT, it) }
         }
     }
 
@@ -152,7 +165,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
             stepCounter?.also {
-                sensorManager.registerListener(this@MainActivity,
+                sensorManager.registerListener(
+                    this@MainActivity,
                     it,
                     SensorManager.SENSOR_DELAY_FASTEST
                 )
@@ -171,6 +185,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             loadData(STEPS_TARGET_PREFERENCES)?.let {
                 stepCounterViewModel.onTargetStepsIndexUpdate(it)
             }
+            loadData(HYDRATION_TARGET)?.let { hydrationViewModel.onNumberGoalUpdate(it.toInt()) }
+            loadData(DRANK_AMOUNT)?.let { hydrationViewModel.onDrankAmountUpdate(it.toInt()) }
         }
         updateStepsAndTimer()
     }
