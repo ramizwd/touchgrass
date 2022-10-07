@@ -1,15 +1,10 @@
 package com.example.touchgrass.ui.hydration
 
-import android.util.Log
-import androidx.compose.foundation.horizontalScroll
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -21,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
-import kotlinx.coroutines.launch
 
 
 /**
@@ -36,30 +30,27 @@ object DefaultValue {
     const val THREE_THOUSAND = 3000
 }
 
+/**
+ * Composable for displaying the Hydration Screen
+ */
 @Composable
 fun HydrationScreen(hydrationViewModel: HydrationViewModel) {
-    val test by hydrationViewModel.numberGoal.observeAsState()
-    val test3 by hydrationViewModel.drankAmount.observeAsState()
+    val hydrationTarget by hydrationViewModel.numberGoal.observeAsState()
+    val waterTaken by hydrationViewModel.drankAmount.observeAsState()
+    val itemAmount by hydrationViewModel.itemsAmount.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
-    var numberGoal by remember { mutableStateOf(test ?: DefaultValue.THREE_THOUSAND) }
-    var drankAmount by remember { mutableStateOf(test3 ?: 0) }
+
+    var numberGoal by remember { mutableStateOf(hydrationTarget ?: DefaultValue.THREE_THOUSAND) }
+
     var liquidAmount by remember { mutableStateOf(DefaultValue.ML) }
-    var itemAmount by remember {
-        mutableStateOf(
-            if (drankAmount < numberGoal)
-                if ((numberGoal - drankAmount) % liquidAmount == 0) (numberGoal - drankAmount) / liquidAmount else (numberGoal - drankAmount) / liquidAmount + 1 else 0
-        )
-    }
 
     HydrationScreenBody(
         hydrationViewModel,
+        waterTaken,
+        itemAmount,
         numberGoal = numberGoal,
         onNumberGoalChange = { numberGoal = it },
-        itemAmount = itemAmount,
-        onItemAmountChange = { itemAmount = it },
-        drankAmount = drankAmount,
-        onDrankChange = { drankAmount = it },
         liquidAmount = liquidAmount,
         onChangeLiquid = { liquidAmount = it },
         expanded = expanded,
@@ -72,17 +63,25 @@ fun HydrationScreen(hydrationViewModel: HydrationViewModel) {
 @Composable
 fun HydrationScreenBody(
     hydrationViewModel: HydrationViewModel,
+    waterTaken: Int?,
+    itemAmount: Int?,
     numberGoal: Int,
     onNumberGoalChange: (Int) -> Unit,
-    itemAmount: Int,
-    onItemAmountChange: (Int) -> Unit,
-    drankAmount: Int,
-    onDrankChange: (Int) -> Unit,
     liquidAmount: Int,
     onChangeLiquid: (Int) -> Unit,
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit
 ) {
+
+    hydrationViewModel.onItemsAmountUpdate(
+        if ((waterTaken ?: 0) < numberGoal)
+            if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) (numberGoal - (waterTaken
+                ?: 0)) / liquidAmount
+            else (numberGoal - (waterTaken
+                ?: 0)) / liquidAmount + 1
+        else 0
+    )
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(
             contentAlignment = Alignment.Center,
@@ -107,24 +106,21 @@ fun HydrationScreenBody(
                             hydrationViewModel.onNumberGoalUpdate(values)
                             onNumberGoalChange(values)
                             onExpanded(false)
-                            if (drankAmount < values) onItemAmountChange(
-                                if ((values - drankAmount) % liquidAmount == 0) (values - drankAmount) / liquidAmount
-                                else (values - drankAmount) / liquidAmount + 1
-                            ) else onItemAmountChange(0)
                         }) {
                             Text(text = "$values ml")
                         }
                     }
                 }
             }
+
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularProgressBar(
-                    percentage = drankAmount / numberGoal.toFloat(),
+                    percentage = (waterTaken ?: 0) / numberGoal.toFloat(),
                     number = numberGoal,
-                    color = if (drankAmount >= numberGoal) Color.Green else Color.Blue
+                    color = if ((waterTaken ?: 0) >= numberGoal) Color.Green else Color.Blue
                 )
             }
         }
@@ -143,10 +139,6 @@ fun HydrationScreenBody(
                         val values = DefaultValue.ONE_HUNDRED + (DefaultValue.FIFTY * it)
                         Button(
                             onClick = {
-                                if (drankAmount < numberGoal) onItemAmountChange(
-                                    if ((numberGoal - drankAmount) % values == 0) (numberGoal - drankAmount) / values
-                                    else (numberGoal - drankAmount) / values + 1
-                                )
                                 onChangeLiquid(values)
                             },
                             modifier = Modifier
@@ -168,63 +160,33 @@ fun HydrationScreenBody(
                         bottom = 16.dp
                     ),
                 ) {
-                    items(itemAmount) {
-                        OutlinedButton(
-                            onClick = {
-                                onDrankChange(drankAmount + liquidAmount)
-                                hydrationViewModel.onDrankAmountUpdate(drankAmount + liquidAmount)
-                                onItemAmountChange(itemAmount - 1)
-                            },
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Red
-                            )
-                        ) {
-                            Icon(
-                                //Place Holder for a cup
-                                Icons.Filled.Add,
-                                contentDescription = null,
-                                modifier = Modifier.size(ButtonDefaults.IconSize)
-                            )
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text(text = "$liquidAmount ml")
+                    if (itemAmount != null) {
+                        items(itemAmount) {
+                            OutlinedButton(
+                                onClick = {
+                                    hydrationViewModel.onDrankAmountPlus(liquidAmount)
+                                    hydrationViewModel.onItemsAmountReduce()
+                                },
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color.White,
+                                    contentColor = Color.Red
+                                )
+                            ) {
+                                Icon(
+                                    //Place Holder for a cup
+                                    Icons.Filled.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                                )
+                                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                Text(text = "$liquidAmount ml")
+                            }
                         }
                     }
                 }
-/*                Column(
-                    modifier = Modifier
-                        .verticalScroll(te)
-                        .fillMaxWidth()
-                ) {
-                    for (it in 1..itemAmount) {
-                        OutlinedButton(
-                            onClick = {
-                                onDrankChange(drankAmount + liquidAmount)
-                                hydrationViewModel.onDrankAmountUpdate(drankAmount + liquidAmount)
-                                onItemAmountChange(itemAmount - 1)
-                            },
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.White ,
-                                contentColor = Color.Red
-                            )
-                        ) {
-                            Icon(
-                                //Place Holder for a cup
-                                Icons.Filled.Add,
-                                contentDescription = null,
-                                modifier = Modifier.size(ButtonDefaults.IconSize)
-                            )
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text(text = "$liquidAmount ml")
-                        }
-                    }
-                }*/
             }
         }
     }

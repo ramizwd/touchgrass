@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 if (currentDayOfWeek != previousDayOfWeek) {
                     previousTotalSteps = totalSteps
                     previousDayOfWeek = currentDayOfWeek
-
+                    hydrationViewModel.onDrankAmountUpdate(0)
                     lifecycleScope.launch {
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
                     }
