@@ -27,7 +27,7 @@ fun Navigation(
     stepCounterViewModel: StepCounterViewModel,
     homeViewModel: HomeViewModel,
     heartRateMonitorViewModel: HeartRateMonitorViewModel,
-    bluetoothAdapter: BluetoothAdapter,
+    bluetoothAdapter: BluetoothAdapter?,
     hydrationViewModel: HydrationViewModel,
 ) {
     val navController = rememberNavController()
