@@ -1,6 +1,8 @@
 package com.example.touchgrass
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -32,6 +34,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+
 class MainActivity : ComponentActivity(), SensorEventListener {
 
     companion object {
@@ -54,12 +57,38 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     private var previousTotalSteps = 0f
     private var previousDayOfWeek = 0f
     private var currentDayOfWeek = 0f
+    private var bluetoothAdapter: BluetoothAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
         homeViewModel = HomeViewModel()
-        heartRateMonitorViewModel = HeartRateMonitorViewModel()
+        heartRateMonitorViewModel = HeartRateMonitorViewModel(application)
+
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager.adapter
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ), 1
+            )
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ), 1
+            )
+        }
+        if (bluetoothAdapter == null) {
+            Log.d("DBG", "This device does not support BT")
+            return
+        }
+        if (!bluetoothAdapter!!.isEnabled) {
+            Log.d("DBG", "BT sensor disabled")
+        }
 
         if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) !=
@@ -79,7 +108,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     Navigation(
                         stepCounterViewModel,
                         homeViewModel,
-                        heartRateMonitorViewModel
+                        heartRateMonitorViewModel,
+                        bluetoothAdapter!!
                     )
                 }
             }
@@ -105,6 +135,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     previousDayOfWeek = currentDayOfWeek
 
                     lifecycleScope.launch {
+                        saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
                     }
                 }
@@ -143,6 +174,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
+            saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }

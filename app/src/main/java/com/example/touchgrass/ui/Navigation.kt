@@ -1,5 +1,6 @@
 package com.example.touchgrass.ui
 
+import android.bluetooth.BluetoothAdapter
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +25,8 @@ object Navigation {
 fun Navigation(
     stepCounterViewModel: StepCounterViewModel,
     homeViewModel: HomeViewModel,
-    heartRateMonitorViewModel: HeartRateMonitorViewModel
+    heartRateMonitorViewModel: HeartRateMonitorViewModel,
+    bluetoothAdapter: BluetoothAdapter
 ) {
     val navController = rememberNavController()
 
@@ -48,7 +50,8 @@ fun Navigation(
         }
         composable(Navigation.HEART_RATE_MONITOR) {
             HeartRateMonitorScreen(
-                viewModel = heartRateMonitorViewModel
+                viewModel = heartRateMonitorViewModel,
+                bluetoothAdapter = bluetoothAdapter
             )
         }
     }
