@@ -68,6 +68,9 @@ fun HomeScreenBody(
                 Button(onClick = {
                     navController.navigate(Navigation.HYDRATION)
                 }) { Text(text = "HYDRATION") }
+                Button(onClick = {
+                    navController.navigate(Navigation.HEART_RATE_MONITOR)
+                }) { Text(text = "HEART RATE MONITOR") }
             }
         }
     }
