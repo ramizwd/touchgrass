@@ -1,6 +1,8 @@
 package com.example.touchgrass
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -24,6 +26,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.example.touchgrass.ui.Navigation
+import com.example.touchgrass.ui.heartratemonitor.HeartRateMonitorViewModel
 import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
@@ -31,6 +34,7 @@ import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+
 
 class MainActivity : ComponentActivity(), SensorEventListener {
 
@@ -48,26 +52,52 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private lateinit var homeViewModel: HomeViewModel
+        private lateinit var heartRateMonitorViewModel: HeartRateMonitorViewModel
         private lateinit var hydrationViewModel: HydrationViewModel
+
     }
 
     private var totalSteps = 0f
     private var previousTotalSteps = 0f
     private var previousDayOfWeek = 0f
     private var currentDayOfWeek = 0f
+    private var bluetoothAdapter: BluetoothAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         stepCounterViewModel = StepCounterViewModel()
         homeViewModel = HomeViewModel()
         hydrationViewModel = HydrationViewModel()
+        heartRateMonitorViewModel = HeartRateMonitorViewModel(application)
 
-        if ((ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            ) !=
-                    PackageManager.PERMISSION_GRANTED)
-        ) {
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager.adapter
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ), 1
+            )
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ), 1
+            )
+        }
+        if (bluetoothAdapter == null) {
+            Log.d("DBG", "This device does not support BT")
+            return
+        }
+        if (!bluetoothAdapter!!.isEnabled) {
+            Log.d("DBG", "BT sensor disabled")
+        }
+
+        if ((ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACTIVITY_RECOGNITION) !=
+                    PackageManager.PERMISSION_GRANTED)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
@@ -85,8 +115,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
                     Navigation(
                         stepCounterViewModel,
+                        homeViewModel,
+                        heartRateMonitorViewModel,
                         hydrationViewModel,
-                        homeViewModel
+                        bluetoothAdapter!!
                     )
                 }
             }
@@ -112,6 +144,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     previousDayOfWeek = currentDayOfWeek
                     hydrationViewModel.onDrankAmountUpdate(0)
                     lifecycleScope.launch {
+                        saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
                     }
                 }
@@ -150,6 +183,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
+            saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }

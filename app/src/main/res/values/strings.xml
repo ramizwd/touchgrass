@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">touchgrass</string>
-    <string name="water">How much water have you drank?</string>
+    <string name="enable_bt_toast">Please enable Bluetooth</string>
+    <string name="scan_bt_btn">SCAN</string>
+    <string name="scanning_bt_txt">SCANNING…</string>
+    <string name="no_devices_found_bt">No devices found.</string>
+    <string name="connected_bt">Connected</string>
+    <string name="hr_bpm_txt">%d BPM</string>
+    <string name="unknown_bt_device">Unknown device</string>
 </resources>
