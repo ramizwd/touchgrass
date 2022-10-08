@@ -15,7 +15,9 @@ import com.github.mikephil.charting.data.LineDataSet
 fun HeartRateGraph(hr: Float?, sec: Float?) {
 
     val dataSets = remember { mutableStateListOf<Entry>() }
-    dataSets.add(Entry(sec ?: 0f, hr ?: 0f))
+    hr?.let {
+        dataSets.add(Entry(sec ?: 0f, hr))
+    }
 
     AndroidView (
         modifier = Modifier.fillMaxSize(),
