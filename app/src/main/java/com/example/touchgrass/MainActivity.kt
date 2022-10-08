@@ -135,6 +135,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     previousTotalSteps = totalSteps
                     previousDayOfWeek = currentDayOfWeek
                     hydrationViewModel.onDrankAmountUpdate(0)
+
                     lifecycleScope.launch {
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
