@@ -112,13 +112,12 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-
                     Navigation(
                         stepCounterViewModel,
                         homeViewModel,
                         heartRateMonitorViewModel,
+                        bluetoothAdapter!!,
                         hydrationViewModel,
-                        bluetoothAdapter!!
                     )
                 }
             }
