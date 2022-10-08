@@ -87,13 +87,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 ), 1
             )
         }
-        if (bluetoothAdapter == null) {
-            Log.d("DBG", "This device does not support BT")
-            return
-        }
-        if (!bluetoothAdapter!!.isEnabled) {
-            Log.d("DBG", "BT sensor disabled")
-        }
 
         if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) !=
@@ -116,7 +109,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         stepCounterViewModel,
                         homeViewModel,
                         heartRateMonitorViewModel,
-                        bluetoothAdapter!!,
+                        bluetoothAdapter,
                         hydrationViewModel,
                     )
                 }
@@ -145,6 +138,12 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     lifecycleScope.launch {
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
+                        hydrationViewModel.numberGoal.value?.toFloat()?.let {
+                            saveData(HYDRATION_TARGET, it)
+                        }
+                        hydrationViewModel.drankAmount.value?.toFloat()?.let {
+                            saveData(DRANK_AMOUNT, it)
+                        }
                     }
                 }
                 timeHandler.postDelayed(this, 1000)

@@ -26,7 +26,7 @@ import com.example.touchgrass.R
 @Composable
 fun HeartRateMonitorScreen(
     viewModel: HeartRateMonitorViewModel,
-    bluetoothAdapter: BluetoothAdapter
+    bluetoothAdapter: BluetoothAdapter?
 ) {
 
     HeartRateMonitorBody(
@@ -38,7 +38,7 @@ fun HeartRateMonitorScreen(
 @Composable
 fun HeartRateMonitorBody(
     viewModel: HeartRateMonitorViewModel,
-    bluetoothAdapter: BluetoothAdapter
+    bluetoothAdapter: BluetoothAdapter?
 ) {
     val context = LocalContext.current
     val btScanning: Boolean by viewModel.btScanning.observeAsState(false)
@@ -76,12 +76,16 @@ fun HeartRateMonitorBody(
             ) {
                 Button(
                     onClick = {
-                        if (bluetoothAdapter.isEnabled) {
+                        if (bluetoothAdapter == null) {
+                            Toast.makeText(context,
+                                context.getString(R.string.device_does_not_support_bt),
+                                Toast.LENGTH_LONG).show()
+                        }
+                        if (bluetoothAdapter?.isEnabled == true) {
                             viewModel.scanDevices(bluetoothAdapter.bluetoothLeScanner)
                         } else {
                             Toast.makeText(context,
-                            context.getString(R.string.enable_bt_toast), Toast.LENGTH_LONG)
-                                .show()
+                            context.getString(R.string.enable_bt_toast), Toast.LENGTH_LONG).show()
                         }
                     },
                     modifier = Modifier
