@@ -3,6 +3,7 @@ package com.example.touchgrass.ui.stepcounter
 import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,13 +14,8 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 
-/*
-TODO
-  - Save entries to DB
-  - Reset graph every week
- */
 @Composable
-fun StepCounterGraph(steps: Int?, dayOfWeek: Int?) {
+fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
     val dataSet = remember { mutableStateListOf(
         BarEntry(1f ,0f),
         BarEntry(2f ,0f),
@@ -30,8 +26,9 @@ fun StepCounterGraph(steps: Int?, dayOfWeek: Int?) {
         BarEntry(7f ,0f)
     )}
 
-    dayOfWeek?.let {
-        dataSet[dayOfWeek -1] = BarEntry(dayOfWeek.toFloat(), steps?.toFloat() ?: 0f)
+    val graphEntries = stepsGraphViewModel.getAllGraphEntries().observeAsState(listOf())
+    graphEntries.value.forEach {
+        dataSet[it.dayOfWeek.toInt() - 1] = BarEntry(it.dayOfWeek, it.steps)
     }
 
     AndroidView (
