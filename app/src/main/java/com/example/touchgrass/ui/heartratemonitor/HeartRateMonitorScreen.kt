@@ -26,31 +26,46 @@ import com.example.touchgrass.R
 @Composable
 fun HeartRateMonitorScreen(
     viewModel: HeartRateMonitorViewModel,
-    bluetoothAdapter: BluetoothAdapter
+    bluetoothAdapter: BluetoothAdapter?
 ) {
+    val btScanning: Boolean by viewModel.btScanning.observeAsState(false)
+    val bpm by viewModel.mBPM.observeAsState()
+    val writing by viewModel.writing.observeAsState()
+    val isConnected by viewModel.gattConnection.observeAsState()
+
+    val heartRate by viewModel.heartRateData.observeAsState()
+    val seconds by viewModel.secondsData.observeAsState()
+
+    val gattClientCallback = GattClientCallback(viewModel)
 
     HeartRateMonitorBody(
         viewModel = viewModel,
-        bluetoothAdapter = bluetoothAdapter
+        bluetoothAdapter = bluetoothAdapter,
+        btScanning = btScanning,
+        bpm = bpm,
+        writing = writing,
+        isConnected = isConnected,
+        heartRate = heartRate,
+        seconds = seconds,
+        gattClientCallback = gattClientCallback
     )
 }
 
 @Composable
 fun HeartRateMonitorBody(
     viewModel: HeartRateMonitorViewModel,
-    bluetoothAdapter: BluetoothAdapter
+    bluetoothAdapter: BluetoothAdapter?,
+    btScanning: Boolean,
+    bpm: Int?,
+    writing: Boolean?,
+    isConnected: Boolean?,
+    heartRate: Float?,
+    seconds: Float?,
+    gattClientCallback: GattClientCallback
 ) {
+
     val context = LocalContext.current
-    val btScanning: Boolean by viewModel.btScanning.observeAsState(false)
-    val bpm by viewModel.mBPM.observeAsState()
-    val writing by viewModel.writing.observeAsState()
-    val isConnected by viewModel.gattConnection.observeAsState()
     var result: List<ScanResult>? = null
-
-    val hr by viewModel.heartRateData.observeAsState()
-    val sec by viewModel.secondsData.observeAsState()
-
-    val gattClientCallback = GattClientCallback(viewModel)
 
     if (ActivityCompat.checkSelfPermission(
             context,
@@ -76,12 +91,16 @@ fun HeartRateMonitorBody(
             ) {
                 Button(
                     onClick = {
-                        if (bluetoothAdapter.isEnabled) {
+                        if (bluetoothAdapter == null) {
+                            Toast.makeText(context,
+                                context.getString(R.string.device_does_not_support_bt),
+                                Toast.LENGTH_LONG).show()
+                        }
+                        if (bluetoothAdapter?.isEnabled == true) {
                             viewModel.scanDevices(bluetoothAdapter.bluetoothLeScanner)
                         } else {
                             Toast.makeText(context,
-                            context.getString(R.string.enable_bt_toast), Toast.LENGTH_LONG)
-                                .show()
+                            context.getString(R.string.enable_bt_toast), Toast.LENGTH_LONG).show()
                         }
                     },
                     modifier = Modifier
@@ -97,7 +116,8 @@ fun HeartRateMonitorBody(
                         text = if (writing == true)
                             stringResource(R.string.hr_bpm_txt, bpm ?: 0)
                         else if (isConnected == true)
-                            stringResource(R.string.connected_bt) else "",
+                            stringResource(R.string.connected_bt)
+                        else "",
                         modifier = Modifier.padding(8.dp)
                     )
                     LazyColumn {
@@ -113,7 +133,10 @@ fun HeartRateMonitorBody(
                                         modifier = Modifier.selectable(
                                             selected = true,
                                             onClick = {
-                                                gattClientCallback.connectToHRMonitor(device.device, context)
+                                                gattClientCallback.connectToHRMonitor(
+                                                    device.device,
+                                                    context
+                                                )
                                             }
                                         )
                                     )
@@ -131,7 +154,7 @@ fun HeartRateMonitorBody(
                 .weight(1f)
         ) {
             Column {
-                HeartRateGraph(hr, sec)
+                HeartRateGraph(heartRate, seconds)
             }
         }
     }

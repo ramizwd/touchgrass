@@ -25,15 +25,19 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
+import com.example.touchgrass.data.database.StepsGraph
 import com.example.touchgrass.ui.Navigation
 import com.example.touchgrass.ui.heartratemonitor.HeartRateMonitorViewModel
 import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
+import com.example.touchgrass.ui.stepcounter.StepsGraphViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.temporal.WeekFields
+import java.util.*
 
 
 class MainActivity : ComponentActivity(), SensorEventListener {
@@ -44,7 +48,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         private const val TAG = "StepCounter"
         private const val STEPS_PREFERENCES = "steps"
-        private const val STEPS_DAY_PREFERENCES = "step_counter_time"
+        private const val STEPS_DAY_PREFERENCES = "step_counter_day"
+        private const val STEPS_WEEK_PREFERENCES = "step_counter_week"
         private const val STEPS_TARGET_PREFERENCES = "step_target"
         private const val DRANK_AMOUNT = "drank_amount"
         private const val HYDRATION_TARGET = "number_goal"
@@ -54,13 +59,15 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private lateinit var homeViewModel: HomeViewModel
         private lateinit var heartRateMonitorViewModel: HeartRateMonitorViewModel
         private lateinit var hydrationViewModel: HydrationViewModel
-
+        private lateinit var stepsGraphViewModel: StepsGraphViewModel
     }
 
     private var totalSteps = 0f
     private var previousTotalSteps = 0f
-    private var previousDayOfWeek = 0f
-    private var currentDayOfWeek = 0f
+    private var previousDayOfMonth = 0f
+    private var currentDayOfMonth = 0f
+    private var currentWeekNumber = 0f
+    private var previousWeekNumber = 0f
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +76,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         homeViewModel = HomeViewModel()
         hydrationViewModel = HydrationViewModel()
         heartRateMonitorViewModel = HeartRateMonitorViewModel(application)
+        stepsGraphViewModel = StepsGraphViewModel(application)
 
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
@@ -87,13 +95,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 ), 1
             )
         }
-        if (bluetoothAdapter == null) {
-            Log.d("DBG", "This device does not support BT")
-            return
-        }
-        if (!bluetoothAdapter!!.isEnabled) {
-            Log.d("DBG", "BT sensor disabled")
-        }
 
         if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) !=
@@ -101,7 +102,9 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0
+                    arrayOf(
+                        Manifest.permission.ACTIVITY_RECOGNITION
+                    ), 0
                 )
             }
         }
@@ -116,35 +119,63 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         stepCounterViewModel,
                         homeViewModel,
                         heartRateMonitorViewModel,
-                        bluetoothAdapter!!,
+                        bluetoothAdapter,
                         hydrationViewModel,
+                        stepsGraphViewModel,
                     )
                 }
             }
         }
     }
 
+    /**
+     * Handler for getting the time and changing variables based on the it.
+     */
     private fun updateStepsAndTimer() {
         val timeHandler = Handler(mainLooper)
         timeHandler.postDelayed(object : Runnable {
             override fun run() {
-                currentDayOfWeek = LocalDateTime.now().dayOfWeek.value.toFloat()
-                val currentHour = LocalDateTime.now().hour
-                val currentMinute = LocalDateTime.now().minute
+                val dateNow = LocalDateTime.now()
+                val currentDayOfWeek = dateNow.dayOfWeek.value.toFloat()
+                val weekFields = WeekFields.ISO
+                val currentHour = dateNow.hour
+                val currentMinute = dateNow.minute
+
+                currentDayOfMonth = dateNow.dayOfMonth.toFloat()
+                currentWeekNumber = dateNow.get(weekFields.weekOfWeekBasedYear()).toFloat()
+
                 val totalMinutesOfDay = ((currentHour * 60) + currentMinute)
                 val currentSteps = totalSteps - previousTotalSteps
 
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
-                stepCounterViewModel.onDayUpdate(currentDayOfWeek.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
+                stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
 
-                if (currentDayOfWeek != previousDayOfWeek) {
+                if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
+
+                    if (currentWeekNumber != previousWeekNumber){
+                        stepsGraphViewModel.deleteEntries()
+                        for (i in 1..7){
+                            stepsGraphViewModel.insertEntry(StepsGraph(i.toFloat(), 0f))
+                        }
+                        previousWeekNumber = currentWeekNumber
+                    }
+
                     previousTotalSteps = totalSteps
-                    previousDayOfWeek = currentDayOfWeek
+                    previousDayOfMonth = currentDayOfMonth
                     hydrationViewModel.onDrankAmountUpdate(0)
+
                     lifecycleScope.launch {
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
-                        saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
+                        saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
+                        saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
+
+                        hydrationViewModel.numberGoal.value?.toFloat()?.let {
+                            saveData(HYDRATION_TARGET, it)
+                        }
+                        hydrationViewModel.drankAmount.value?.toFloat()?.let {
+                            saveData(DRANK_AMOUNT, it)
+                        }
                     }
                 }
                 timeHandler.postDelayed(this, 1000)
@@ -163,7 +194,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
 
     /**
-     * DataStore functions for saving TYPE_STEP_COUNTER sensor data
+     * DataStore functions for saving step counter sensor data and time
      */
     private suspend fun saveData(key: String, value: Float) {
         val dataStoreKey = floatPreferencesKey(key)
@@ -182,12 +213,17 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
-            saveData(STEPS_DAY_PREFERENCES, currentDayOfWeek)
+            saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
+            saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }
-            hydrationViewModel.numberGoal.value?.toFloat()?.let { saveData(HYDRATION_TARGET, it) }
-            hydrationViewModel.drankAmount.value?.toFloat()?.let { saveData(DRANK_AMOUNT, it) }
+            hydrationViewModel.numberGoal.value?.toFloat()?.let {
+                saveData(HYDRATION_TARGET, it)
+            }
+            hydrationViewModel.drankAmount.value?.toFloat()?.let {
+                saveData(DRANK_AMOUNT, it)
+            }
         }
     }
 
@@ -213,13 +249,20 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             previousTotalSteps = savedSteps ?: 0f
 
             val savedDayOfWeek = loadData(STEPS_DAY_PREFERENCES)
-            previousDayOfWeek = savedDayOfWeek ?: 0f
+            previousDayOfMonth = savedDayOfWeek ?: 0f
+
+            val savedWeekNumber = loadData(STEPS_WEEK_PREFERENCES)
+            previousWeekNumber = savedWeekNumber ?: 0f
 
             loadData(STEPS_TARGET_PREFERENCES)?.let {
                 stepCounterViewModel.onTargetStepsIndexUpdate(it)
             }
-            loadData(HYDRATION_TARGET)?.let { hydrationViewModel.onNumberGoalUpdate(it.toInt()) }
-            loadData(DRANK_AMOUNT)?.let { hydrationViewModel.onDrankAmountUpdate(it.toInt()) }
+            loadData(HYDRATION_TARGET)?.let {
+                hydrationViewModel.onNumberGoalUpdate(it.toInt())
+            }
+            loadData(DRANK_AMOUNT)?.let {
+                hydrationViewModel.onDrankAmountUpdate(it.toInt())
+            }
         }
         updateStepsAndTimer()
     }

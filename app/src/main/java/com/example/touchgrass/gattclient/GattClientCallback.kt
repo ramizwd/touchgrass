@@ -25,7 +25,7 @@ class GattClientCallback(model: HeartRateMonitorViewModel) : BluetoothGattCallba
     }
 
     private val viewModel = model
-    var sec = 0f
+    private var sec = 0f
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
