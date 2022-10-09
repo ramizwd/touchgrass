@@ -25,11 +25,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
+import com.example.touchgrass.data.database.StepsGraph
 import com.example.touchgrass.ui.Navigation
 import com.example.touchgrass.ui.heartratemonitor.HeartRateMonitorViewModel
 import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
+import com.example.touchgrass.ui.stepcounter.StepsGraphViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -54,7 +56,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private lateinit var homeViewModel: HomeViewModel
         private lateinit var heartRateMonitorViewModel: HeartRateMonitorViewModel
         private lateinit var hydrationViewModel: HydrationViewModel
-
+        private lateinit var stepsGraphViewModel: StepsGraphViewModel
     }
 
     private var totalSteps = 0f
@@ -69,6 +71,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         homeViewModel = HomeViewModel()
         hydrationViewModel = HydrationViewModel()
         heartRateMonitorViewModel = HeartRateMonitorViewModel(application)
+        stepsGraphViewModel = StepsGraphViewModel(application)
 
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
@@ -94,7 +97,9 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 0
+                    arrayOf(
+                        Manifest.permission.ACTIVITY_RECOGNITION
+                    ), 0
                 )
             }
         }
@@ -111,12 +116,16 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         heartRateMonitorViewModel,
                         bluetoothAdapter,
                         hydrationViewModel,
+                        stepsGraphViewModel,
                     )
                 }
             }
         }
     }
 
+    /**
+     * Handler for getting the time and changing variables based on the time.
+     */
     private fun updateStepsAndTimer() {
         val timeHandler = Handler(mainLooper)
         timeHandler.postDelayed(object : Runnable {
@@ -128,10 +137,18 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 val currentSteps = totalSteps - previousTotalSteps
 
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
-                stepCounterViewModel.onDayUpdate(currentDayOfWeek.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
+                stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
 
                 if (currentDayOfWeek != previousDayOfWeek) {
+
+                    if (previousDayOfWeek == 7f && currentDayOfWeek == 1f){
+                        stepsGraphViewModel.deleteEntries()
+                        for (i in 1..7){
+                            stepsGraphViewModel.insertEntry(StepsGraph(i.toFloat(), 0f))
+                        }
+                    }
+
                     previousTotalSteps = totalSteps
                     previousDayOfWeek = currentDayOfWeek
                     hydrationViewModel.onDrankAmountUpdate(0)

@@ -13,36 +13,35 @@ import com.example.touchgrass.ui.shared.components.CircularProgressBar
 
 @Composable
 fun StepCounterScreen(
-    viewModel: StepCounterViewModel
+    viewModel: StepCounterViewModel,
+    stepsGraphViewModel: StepsGraphViewModel
 ) {
     val steps by viewModel.currentSteps.observeAsState()
     val targetSteps by viewModel.targetStepsIndex.observeAsState()
-    val dayOfWeek by viewModel.dayOfWeek.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
     val targetStepsList = mutableListOf<Int>()
 
-    // for loop too large (slow)
     for (i in 1000..50000 step 1000) targetStepsList.add(i)
     var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
     StepCounterScreenBody(
-        dayOfWeek = dayOfWeek,
         viewModel = viewModel,
+        stepsGraphViewModel = stepsGraphViewModel,
         steps = steps,
         stepsTarget = stepsTarget,
         expanded = expanded,
         onExpanded = { expanded = it },
         targetStepsList = targetStepsList,
-        onSelectedIndex = { selectedIndex = it }
+        onSelectedIndex = { selectedIndex = it },
     )
 }
 
 @Composable
 fun StepCounterScreenBody(
     viewModel: StepCounterViewModel,
-    dayOfWeek: Int?,
+    stepsGraphViewModel: StepsGraphViewModel,
     steps: Int?,
     stepsTarget: Float,
     targetStepsList: List<Int>,
@@ -50,6 +49,7 @@ fun StepCounterScreenBody(
     onExpanded: (Boolean) -> Unit,
     onSelectedIndex: (Int) -> Unit,
 ) {
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -97,7 +97,7 @@ fun StepCounterScreenBody(
                 .weight(1f)
         ) {
             Column {
-                StepCounterGraph(steps, dayOfWeek)
+                StepCounterGraph(stepsGraphViewModel)
             }
         }
     }

@@ -13,13 +13,13 @@ import com.example.touchgrass.ui.hydration.HydrationScreen
 import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterScreen
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
+import com.example.touchgrass.ui.stepcounter.StepsGraphViewModel
 
 object Navigation {
     const val HOME = "home"
     const val STEP_COUNTER = "stepCounter"
     const val HYDRATION = "hydration"
     const val HEART_RATE_MONITOR = "heartRateMonitor"
-
 }
 
 @Composable
@@ -29,6 +29,7 @@ fun Navigation(
     heartRateMonitorViewModel: HeartRateMonitorViewModel,
     bluetoothAdapter: BluetoothAdapter?,
     hydrationViewModel: HydrationViewModel,
+    stepsGraphViewModel: StepsGraphViewModel
 ) {
     val navController = rememberNavController()
 
@@ -47,7 +48,8 @@ fun Navigation(
         }
         composable(Navigation.STEP_COUNTER) {
             StepCounterScreen(
-                viewModel = stepCounterViewModel
+                viewModel = stepCounterViewModel,
+                stepsGraphViewModel = stepsGraphViewModel
             )
         }
         composable(Navigation.HEART_RATE_MONITOR) {
