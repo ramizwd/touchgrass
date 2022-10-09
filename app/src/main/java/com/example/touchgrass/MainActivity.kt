@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.temporal.WeekFields
-import java.util.*
 
 
 class MainActivity : ComponentActivity(), SensorEventListener {
