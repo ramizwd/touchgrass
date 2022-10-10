@@ -24,11 +24,11 @@ import com.example.touchgrass.ui.shared.components.CircularProgressBar
  */
 
 object DefaultValue {
-    const val ML = 250
-    const val THOUSAND = 1000
-    const val ONE_HUNDRED = 100
-    const val FIFTY = 50
-    const val THREE_THOUSAND = 3000
+    const val DRINKING_AMOUNT = 250
+    const val LIST_STARTING_VALUE = 1000
+    const val CUP_SIZE_LIST_STARTING_VALUE = 100
+    const val CUP_SIZE = 50
+    const val STARTING_HYDRATION_TARGET = 3000
 }
 
 /**
@@ -38,18 +38,18 @@ object DefaultValue {
 fun HydrationScreen(hydrationViewModel: HydrationViewModel) {
     val hydrationTarget by hydrationViewModel.numberGoal.observeAsState()
     val waterTaken by hydrationViewModel.drankAmount.observeAsState()
-    val itemAmount by hydrationViewModel.itemsAmount.observeAsState()
+    val buttonAmount by hydrationViewModel.buttonsAmount.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
 
-    var numberGoal by remember { mutableStateOf(hydrationTarget ?: DefaultValue.THREE_THOUSAND) }
+    var numberGoal by remember { mutableStateOf(hydrationTarget ?: DefaultValue.STARTING_HYDRATION_TARGET) }
 
-    var liquidAmount by remember { mutableStateOf(DefaultValue.ML) }
+    var liquidAmount by remember { mutableStateOf(DefaultValue.DRINKING_AMOUNT) }
 
     HydrationScreenBody(
         hydrationViewModel,
         waterTaken,
-        itemAmount,
+        buttonAmount,
         numberGoal = numberGoal,
         onNumberGoalChange = { numberGoal = it },
         liquidAmount = liquidAmount,
@@ -65,7 +65,7 @@ fun HydrationScreen(hydrationViewModel: HydrationViewModel) {
 fun HydrationScreenBody(
     hydrationViewModel: HydrationViewModel,
     waterTaken: Int?,
-    itemAmount: Int?,
+    buttonAmount: Int?,
     numberGoal: Int,
     onNumberGoalChange: (Int) -> Unit,
     liquidAmount: Int,
@@ -74,7 +74,7 @@ fun HydrationScreenBody(
     onExpanded: (Boolean) -> Unit
 ) {
 
-    hydrationViewModel.onItemsAmountUpdate(
+    hydrationViewModel.onButtonsAmountUpdate(
         if ((waterTaken ?: 0) < numberGoal)
             if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) (numberGoal - (waterTaken
                 ?: 0)) / liquidAmount
@@ -102,7 +102,7 @@ fun HydrationScreenBody(
                     onDismissRequest = { onExpanded(false) }
                 ) {
                     for (i in 0.rangeTo(16)) {
-                        val values = DefaultValue.THOUSAND + (DefaultValue.ML * i)
+                        val values = DefaultValue.LIST_STARTING_VALUE + (DefaultValue.DRINKING_AMOUNT * i)
                         DropdownMenuItem(onClick = {
                             hydrationViewModel.onNumberGoalUpdate(values)
                             onNumberGoalChange(values)
@@ -137,7 +137,7 @@ fun HydrationScreenBody(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     items(19) {
-                        val values = DefaultValue.ONE_HUNDRED + (DefaultValue.FIFTY * it)
+                        val values = DefaultValue.CUP_SIZE_LIST_STARTING_VALUE + (DefaultValue.CUP_SIZE * it)
                         Button(
                             onClick = {
                                 onChangeLiquid(values)
@@ -162,8 +162,8 @@ fun HydrationScreenBody(
                         bottom = 16.dp
                     ),
                 ) {
-                    if (itemAmount != null) {
-                        items(itemAmount) {
+                    if (buttonAmount != null) {
+                        items(buttonAmount) {
                             OutlinedButton(
                                 onClick = {
                                     hydrationViewModel.onDrankAmountPlus(liquidAmount)

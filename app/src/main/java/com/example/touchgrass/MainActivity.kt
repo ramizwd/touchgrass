@@ -25,14 +25,17 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.example.touchgrass.ui.Navigation
 import com.example.touchgrass.ui.heartratemonitor.HeartRateMonitorViewModel
 import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.home.HomeViewModel
+import com.example.touchgrass.ui.map.MapViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.osmdroid.config.Configuration
 import java.time.LocalDateTime
 
 
@@ -41,6 +44,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     companion object {
         private lateinit var sensorManager: SensorManager
         private var stepCounter: Sensor? = null
+
 
         private const val TAG = "StepCounter"
         private const val STEPS_PREFERENCES = "steps"
@@ -54,6 +58,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private lateinit var homeViewModel: HomeViewModel
         private lateinit var heartRateMonitorViewModel: HeartRateMonitorViewModel
         private lateinit var hydrationViewModel: HydrationViewModel
+        private lateinit var mapViewModel: MapViewModel
 
     }
 
@@ -69,6 +74,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         homeViewModel = HomeViewModel()
         hydrationViewModel = HydrationViewModel()
         heartRateMonitorViewModel = HeartRateMonitorViewModel(application)
+        mapViewModel = MapViewModel()
 
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
@@ -95,9 +101,12 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             Log.d("DBG", "BT sensor disabled")
         }
 
-        if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACTIVITY_RECOGNITION) !=
-                    PackageManager.PERMISSION_GRANTED)) {
+        if ((ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) !=
+                    PackageManager.PERMISSION_GRANTED)
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
@@ -105,7 +114,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 )
             }
         }
-
+        Configuration.getInstance().load(
+            this,
+            PreferenceManager.getDefaultSharedPreferences(this)
+        )
         setContent {
             TouchgrassTheme {
                 Surface(
@@ -118,6 +130,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         heartRateMonitorViewModel,
                         bluetoothAdapter!!,
                         hydrationViewModel,
+                        mapViewModel
                     )
                 }
             }

@@ -80,4 +80,10 @@ dependencies {
 
     // MPAndroidChart Library
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    // Map
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation 'org.osmdroid:osmdroid-android:6.1.14'
+
+    // old android.preference is deprecated, switch to androidx
+    implementation 'androidx.preference:preference-ktx:1.2.0'
 }

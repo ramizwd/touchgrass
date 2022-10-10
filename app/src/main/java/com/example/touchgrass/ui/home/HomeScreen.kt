@@ -71,6 +71,9 @@ fun HomeScreenBody(
                 Button(onClick = {
                     navController.navigate(Navigation.HEART_RATE_MONITOR)
                 }) { Text(text = "HEART RATE MONITOR") }
+                Button(onClick = {
+                    navController.navigate(Navigation.MAP)
+                }) { Text(text = "MAP") }
             }
         }
     }

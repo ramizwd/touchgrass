@@ -9,8 +9,9 @@ class HydrationViewModel {
 
     private var _drankAmount: MutableLiveData<Int> = MutableLiveData()
     val drankAmount: LiveData<Int> = _drankAmount
-    private var _itemsAmount: MutableLiveData<Int> = MutableLiveData()
-    val itemsAmount: LiveData<Int> = _itemsAmount
+
+    private var _buttonsAmount: MutableLiveData<Int> = MutableLiveData()
+    val buttonsAmount: LiveData<Int> = _buttonsAmount
 
     fun onNumberGoalUpdate(numberGoal: Int) {
         _numberGoal.value = numberGoal
@@ -24,11 +25,11 @@ class HydrationViewModel {
         _drankAmount.value = drankAmount
     }
 
-    fun onItemsAmountUpdate(itemsAmount: Int) {
-        _itemsAmount.value = itemsAmount
+    fun onButtonsAmountUpdate(buttonAmounts: Int) {
+        _buttonsAmount.value = buttonAmounts
     }
 
     fun onItemsAmountReduce() {
-        _itemsAmount.value = _itemsAmount.value?.minus(1)
+        _buttonsAmount.value = _buttonsAmount.value?.minus(1)
     }
 }

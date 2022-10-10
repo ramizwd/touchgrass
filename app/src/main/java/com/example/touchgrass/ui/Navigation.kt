@@ -11,6 +11,9 @@ import com.example.touchgrass.ui.home.HomeScreen
 import com.example.touchgrass.ui.home.HomeViewModel
 import com.example.touchgrass.ui.hydration.HydrationScreen
 import com.example.touchgrass.ui.hydration.HydrationViewModel
+import com.example.touchgrass.ui.map.MapScreen
+import com.example.touchgrass.ui.map.MapScreenBody
+import com.example.touchgrass.ui.map.MapViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterScreen
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 
@@ -19,7 +22,7 @@ object Navigation {
     const val STEP_COUNTER = "stepCounter"
     const val HYDRATION = "hydration"
     const val HEART_RATE_MONITOR = "heartRateMonitor"
-
+    const val MAP = "map"
 }
 
 @Composable
@@ -29,6 +32,7 @@ fun Navigation(
     heartRateMonitorViewModel: HeartRateMonitorViewModel,
     bluetoothAdapter: BluetoothAdapter,
     hydrationViewModel: HydrationViewModel,
+    mapViewModel: MapViewModel
 ) {
     val navController = rememberNavController()
 
@@ -55,6 +59,9 @@ fun Navigation(
                 viewModel = heartRateMonitorViewModel,
                 bluetoothAdapter = bluetoothAdapter
             )
+        }
+        composable(Navigation.MAP) {
+            MapScreen(mapViewModel = mapViewModel)
         }
     }
 }
