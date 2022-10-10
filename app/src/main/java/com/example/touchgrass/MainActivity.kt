@@ -82,8 +82,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
-        Log.d(TAG, "I AM oncreate")
-
         if ((ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACTIVITY_RECOGNITION
@@ -142,7 +140,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
                 stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
-                
+
                 if (previousTotalSteps == 0f) {
                     previousTotalSteps = totalSteps
                 }
@@ -156,19 +154,15 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         }
                         previousWeekNumber = currentWeekNumber
                     }
-                    Log.d(TAG, "I AM DATE")
-                    Log.d(TAG, "$totalSteps $previousTotalSteps")
+
                     previousTotalSteps = totalSteps
-                    Log.d(TAG, "i am now $totalSteps  you are later $previousTotalSteps")
                     previousDayOfMonth = currentDayOfMonth
                     hydrationViewModel.onDrankAmountUpdate(0)
 
                     lifecycleScope.launch {
-                        Log.d(TAG, "2 i am now $totalSteps  you are later $previousTotalSteps")
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
-                        Log.d(TAG, "2 i am now $totalSteps  you are later $previousTotalSteps")
                         hydrationViewModel.numberGoal.value?.toFloat()?.let {
                             saveData(HYDRATION_TARGET, it)
                         }
@@ -214,7 +208,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
             saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
             saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
-            Log.d(TAG, "I AM onpause")
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }
@@ -231,7 +224,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onResume()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        Log.d(TAG, "I AM onresume")
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
             stepCounter?.also {
                 sensorManager.registerListener(
