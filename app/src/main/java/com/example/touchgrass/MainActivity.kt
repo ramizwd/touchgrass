@@ -14,7 +14,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -80,24 +82,14 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ), 1
-            )
-        } else {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ), 1
-            )
-        }
+        Log.d(TAG, "I AM oncreate")
 
-        if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACTIVITY_RECOGNITION) !=
-                    PackageManager.PERMISSION_GRANTED)) {
+        if ((ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) !=
+                    PackageManager.PERMISSION_GRANTED)
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
@@ -132,6 +124,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
      */
     private fun updateStepsAndTimer() {
         val timeHandler = Handler(mainLooper)
+
         timeHandler.postDelayed(object : Runnable {
             override fun run() {
                 val dateNow = LocalDateTime.now()
@@ -145,30 +138,37 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
                 val totalMinutesOfDay = ((currentHour * 60) + currentMinute)
                 val currentSteps = totalSteps - previousTotalSteps
-
+                Log.d(TAG, "$totalSteps $previousTotalSteps")
                 stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                 homeViewModel.onHourUpdate(totalMinutesOfDay)
                 stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
+                
+                if (previousTotalSteps == 0f) {
+                    previousTotalSteps = totalSteps
+                }
 
                 if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
 
-                    if (currentWeekNumber != previousWeekNumber){
+                    if (currentWeekNumber != previousWeekNumber) {
                         stepsGraphViewModel.deleteEntries()
-                        for (i in 1..7){
+                        for (i in 1..7) {
                             stepsGraphViewModel.insertEntry(StepsGraph(i.toFloat(), 0f))
                         }
                         previousWeekNumber = currentWeekNumber
                     }
-
+                    Log.d(TAG, "I AM DATE")
+                    Log.d(TAG, "$totalSteps $previousTotalSteps")
                     previousTotalSteps = totalSteps
+                    Log.d(TAG, "i am now $totalSteps  you are later $previousTotalSteps")
                     previousDayOfMonth = currentDayOfMonth
                     hydrationViewModel.onDrankAmountUpdate(0)
 
                     lifecycleScope.launch {
+                        Log.d(TAG, "2 i am now $totalSteps  you are later $previousTotalSteps")
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
-
+                        Log.d(TAG, "2 i am now $totalSteps  you are later $previousTotalSteps")
                         hydrationViewModel.numberGoal.value?.toFloat()?.let {
                             saveData(HYDRATION_TARGET, it)
                         }
@@ -214,6 +214,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
             saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
             saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
+            Log.d(TAG, "I AM onpause")
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }
@@ -230,7 +231,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         super.onResume()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-
+        Log.d(TAG, "I AM onresume")
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
             stepCounter?.also {
                 sensorManager.registerListener(
