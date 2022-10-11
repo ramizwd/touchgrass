@@ -9,12 +9,17 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import com.example.touchgrass.service.StepCounterService.Companion.isSensorOn
+import com.example.touchgrass.service.StepCounterServiceHelper
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
+import com.example.touchgrass.utils.Constants.ACTION_START_SERVICE
+import com.example.touchgrass.utils.Constants.ACTION_STOP_SERVICE
 
 @Composable
 fun StepCounterScreen(
     viewModel: StepCounterViewModel,
-    stepsGraphViewModel: StepsGraphViewModel
+    stepsGraphViewModel: StepsGraphViewModel,
 ) {
     val steps by viewModel.currentSteps.observeAsState()
     val targetSteps by viewModel.targetStepsIndex.observeAsState()
@@ -49,6 +54,7 @@ fun StepCounterScreenBody(
     onExpanded: (Boolean) -> Unit,
     onSelectedIndex: (Int) -> Unit,
 ) {
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -65,7 +71,15 @@ fun StepCounterScreenBody(
                     number = stepsTarget.toInt(),
                     color = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Yellow
                 )
+                Button(onClick = {
+                    StepCounterServiceHelper.launchForegroundService(
+                        context = context,
+                        action = if(isSensorOn) ACTION_STOP_SERVICE
+                        else ACTION_START_SERVICE
+                    )
+                }) { Text(text = if (isSensorOn) "STOP" else "START") }
             }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()

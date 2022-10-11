@@ -29,7 +29,7 @@ fun Navigation(
     heartRateMonitorViewModel: HeartRateMonitorViewModel,
     bluetoothAdapter: BluetoothAdapter?,
     hydrationViewModel: HydrationViewModel,
-    stepsGraphViewModel: StepsGraphViewModel
+    stepsGraphViewModel: StepsGraphViewModel,
 ) {
     val navController = rememberNavController()
 
@@ -49,7 +49,7 @@ fun Navigation(
         composable(Navigation.STEP_COUNTER) {
             StepCounterScreen(
                 viewModel = stepCounterViewModel,
-                stepsGraphViewModel = stepsGraphViewModel
+                stepsGraphViewModel = stepsGraphViewModel,
             )
         }
         composable(Navigation.HEART_RATE_MONITOR) {
