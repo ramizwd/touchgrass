@@ -150,13 +150,12 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
                 homeViewModel.onStreaksUpdate(streakCounter)
                 if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
-
-                    if (1001f >= (stepCounterViewModel.targetStepsValue.value ?: 1000f)) {
+                    if (previousTotalSteps >= (stepCounterViewModel.targetStepsValue.value ?: 1000f)) {
                         streakCounter += 1f
-                        Log.d("Streak","$streakCounter")
-                    }else{
+                        Log.d("Streak", "$streakCounter")
+                    } else {
                         streakCounter = 0f
-                        Log.d("Streak","$streakCounter")
+                        Log.d("Streak", "$streakCounter")
                     }
 
                     if (currentWeekNumber != previousWeekNumber) {
