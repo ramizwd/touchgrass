@@ -49,7 +49,7 @@ fun StepCounterScreenBody(
     onExpanded: (Boolean) -> Unit,
     onSelectedIndex: (Int) -> Unit,
 ) {
-
+    viewModel.onTargetStepsValueUpdate(stepsTarget)
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
