@@ -1,9 +1,11 @@
 package com.example.touchgrass.ui.heartratemonitor
 
 import android.Manifest
+import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanResult
 import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
 import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.R
 
@@ -77,6 +80,22 @@ fun HeartRateMonitorBody(
         result = results
     }
 
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        requestPermissions(
+            context as Activity,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ), 1
+        )
+    } else {
+        requestPermissions(
+            context as Activity,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ), 1
+        )
+    }
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

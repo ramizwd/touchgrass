@@ -9,7 +9,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -72,7 +74,6 @@ class MainActivity : ComponentActivity() {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
-
         if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) !=
                     PackageManager.PERMISSION_GRANTED)) {
@@ -110,6 +111,7 @@ class MainActivity : ComponentActivity() {
      */
     private fun updateStepsAndTimer() {
         val timeHandler = Handler(mainLooper)
+
         timeHandler.postDelayed(object : Runnable {
             override fun run() {
                 val dateNow = LocalDateTime.now()
@@ -135,6 +137,10 @@ class MainActivity : ComponentActivity() {
                     stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
                 }
 
+                if (previousTotalSteps == 0f) {
+                    previousTotalSteps = totalSteps
+                }
+
                 if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
 
                     if (currentWeekNumber != previousWeekNumber){
@@ -155,7 +161,6 @@ class MainActivity : ComponentActivity() {
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
-
                         hydrationViewModel.numberGoal.value?.toFloat()?.let {
                             saveData(HYDRATION_TARGET_PREFERENCES, it)
                         }
