@@ -1,14 +1,17 @@
 package com.example.touchgrass
 
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.*
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -21,6 +24,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -45,11 +50,11 @@ import java.util.*
 /**
  * TODO
  *  - put constants vals in util
+ *  - get step to service notif
+ *  - clean this mess
  */
-var totalSteps = 0f
-var previousTotalSteps = 0f
-var previousDayOfMonth = 0f
-var currentDayOfMonth = 0f
+
+
 class MainActivity : ComponentActivity(), SensorEventListener {
 
     companion object {
@@ -73,9 +78,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private lateinit var stepsGraphViewModel: StepsGraphViewModel
     }
 
-
-//    private var previousDayOfMonth = 0f
-//    private var currentDayOfMonth = 0f
+    private var totalSteps = 0f
+    private var previousTotalSteps = 0f
+    private var previousDayOfMonth = 0f
+    private var currentDayOfMonth = 0f
     private var currentWeekNumber = 0f
     private var previousWeekNumber = 0f
 
@@ -84,8 +90,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createNotificationChannel()
-        scheduleNotification()
+//        createNotificationChannel()
+//        scheduleNotification()
 
 
         Log.d("ALARMHERE", "HERRROOO")
@@ -190,14 +196,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             this, 0,
             Intent(this, resetVariablesService::class.java), PendingIntent.FLAG_UPDATE_CURRENT
         )
-//        this.getSystemService(ALARM_SERVICE)
-//            .setRepeating(
-//                AlarmManager.RTC_WAKEUP,
-//                calendar.timeInMillis,
-//                AlarmManager.INTERVAL_DAY, pi
-//            )
-
-
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 //        val time = getTime()
@@ -288,35 +286,41 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
                 }
 
-                if (isSensorOn) {
-                    Log.d("SENSORON", "$totalSteps - $previousTotalSteps $currentDayOfMonth != $previousDayOfMonth $currentWeekNumber != $previousWeekNumber")
-                    val currentSteps = totalSteps - previousTotalSteps
-                    Log.d("ALARMHERE", "HERRROOO**$previousTotalSteps = $totalSteps ")
+//                if (isSensorOn) {
+//                Log.d("SENSORON", "$totalSteps - $previousTotalSteps $currentDayOfMonth != $previousDayOfMonth $currentWeekNumber != $previousWeekNumber")
+                var currentSteps = 0f
+                if (totalSteps != 0f) {
+                    currentSteps = totalSteps - previousTotalSteps
 
                     stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                     stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
+                    Log.d("SENSORON", "::::::-----$totalSteps - $previousTotalSteps ::: $currentDayOfWeek, $currentSteps")
 
-                    if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
+                }
 
-                        if (currentWeekNumber != previousWeekNumber){
-                            stepsGraphViewModel.deleteEntries()
-                            for (dayOfWeek in 1..7){
-                                stepsGraphViewModel.insertEntry(StepsGraph(dayOfWeek.toFloat(), 0f))
-                            }
-                            previousWeekNumber = currentWeekNumber
-                            Log.d("SENSORON", "IF week---- $totalSteps - $previousTotalSteps")
+                if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
 
+                    if (currentWeekNumber != previousWeekNumber){
+                        Log.d("SENSORON", "IF week ABOVE---- $totalSteps - $previousTotalSteps :: $currentWeekNumber $previousWeekNumber")
+
+                        stepsGraphViewModel.deleteEntries()
+                        for (dayOfWeek in 1..7){
+                            stepsGraphViewModel.insertEntry(StepsGraph(dayOfWeek.toFloat(), 0f))
                         }
-                        Log.d("SENSORON", "IF---- $totalSteps - $previousTotalSteps $currentDayOfMonth != $previousDayOfMonth $currentWeekNumber != $previousWeekNumber")
-
-//                        previousTotalSteps = totalSteps
-//                        previousDayOfMonth = currentDayOfMonth
-                        hydrationViewModel.onDrankAmountUpdate(0)
-
+                        previousWeekNumber = currentWeekNumber
+                        Log.d("SENSORON", "IF week---- $totalSteps - $previousTotalSteps :: $currentWeekNumber $previousWeekNumber")
 
                     }
+//                    Log.d("SENSORON", "IF---- $totalSteps - $previousTotalSteps $currentDayOfMonth != $previousDayOfMonth $currentWeekNumber != $previousWeekNumber")
+                    Log.d("SENSORON", "IF DAY---- $totalSteps - $previousTotalSteps :: $currentWeekNumber $previousWeekNumber")
+
+                    previousTotalSteps = totalSteps
+                    previousDayOfMonth = currentDayOfMonth
+                    hydrationViewModel.onDrankAmountUpdate(0)
 
                     lifecycleScope.launch {
+                        Log.d("SENSORON", "COROUTINE IF---- $currentWeekNumber $previousWeekNumber")
+
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
@@ -330,7 +334,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     }
                 }
 
-
+//                }
 
                 timeHandler.postDelayed(this, 1000)
             }
@@ -350,14 +354,14 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     /**
      * DataStore functions for saving step counter sensor data and time
      */
-    private suspend fun saveData(key: String, value: Float) {
+    suspend fun saveData(key: String, value: Float) {
         val dataStoreKey = floatPreferencesKey(key)
         dataStore.edit { steps ->
             steps[dataStoreKey] = value
         }
     }
 
-    private suspend fun loadData(key: String): Float? {
+    suspend fun loadData(key: String): Float? {
         val dataStoreKey = floatPreferencesKey(key)
         val preferences = dataStore.data.first()
         return preferences[dataStoreKey]
@@ -366,6 +370,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     override fun onPause() {
         super.onPause()
         lifecycleScope.launch {
+            Log.d("SENSORON", "ONPAUSE---- $currentWeekNumber $previousWeekNumber")
+
             saveData(STEPS_PREFERENCES, previousTotalSteps)
             saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
             saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
@@ -386,8 +392,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
 
         lifecycleScope.launch {
-//            val savedSteps = loadData(STEPS_PREFERENCES)
-//            previousTotalSteps = savedSteps ?: 0f
+            val savedSteps = loadData(STEPS_PREFERENCES)
+            previousTotalSteps = savedSteps ?: 0f
 
             val savedDayOfWeek = loadData(STEPS_DAY_PREFERENCES)
             previousDayOfMonth = savedDayOfWeek ?: 0f
@@ -404,9 +410,9 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             loadData(DRANK_AMOUNT)?.let {
                 hydrationViewModel.onDrankAmountUpdate(it.toInt())
             }
-            Log.d("SENSORON", "RESUMECO---- $totalSteps - $previousTotalSteps")
+            Log.d("SENSORON", "RESUMECO---- $previousWeekNumber $savedWeekNumber")
 
+            updateStepsAndTimer()
         }
-        updateStepsAndTimer()
     }
 }
