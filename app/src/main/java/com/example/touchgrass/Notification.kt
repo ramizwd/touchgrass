@@ -14,12 +14,11 @@ class Notification : BroadcastReceiver()
 {
     override fun onReceive(context: Context, intent: Intent)
     {
-        previousTotalSteps = totalSteps
-        previousDayOfMonth = currentDayOfMonth
+//        previousTotalSteps = totalSteps
+//        previousDayOfMonth = currentDayOfMonth
 
 
 
-        Log.d("ALARMHERE", "HERRROOO---------$previousTotalSteps = $totalSteps ")
 
         Log.d("ALARMHERE", "HERRROOO---------")
     }
