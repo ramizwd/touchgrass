@@ -59,6 +59,7 @@ fun StepCounterScreenBody(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
+            viewModel.onTargetStepsValueUpdate(stepsTarget)
             Column {
                 CircularProgressBar(
                     percentage = (steps ?: 0) / stepsTarget,
@@ -81,6 +82,7 @@ fun StepCounterScreenBody(
                     targetStepsList.forEachIndexed { index, value ->
                         DropdownMenuItem(onClick = {
                             viewModel.onTargetStepsIndexUpdate(index.toFloat())
+                            viewModel.onTargetStepsValueUpdate(stepsTarget)
                             onSelectedIndex(index)
                             onExpanded(false)
                         }) {

@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         private const val STEPS_TARGET_PREFERENCES = "step_target"
         private const val DRANK_AMOUNT = "drank_amount"
         private const val HYDRATION_TARGET = "number_goal"
+        private const val STREAK_COUNTER = "streak_counter"
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
 
         private lateinit var stepCounterViewModel: StepCounterViewModel
@@ -69,7 +70,9 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     private var currentDayOfMonth = 0f
     private var currentWeekNumber = 0f
     private var previousWeekNumber = 0f
+    private var streakCounter = 0f
     private var bluetoothAdapter: BluetoothAdapter? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,7 +148,16 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     previousTotalSteps = totalSteps
                 }
 
+                homeViewModel.onStreaksUpdate(streakCounter)
                 if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
+
+                    if (1001f >= (stepCounterViewModel.targetStepsValue.value ?: 1000f)) {
+                        streakCounter += 1f
+                        Log.d("Streak","$streakCounter")
+                    }else{
+                        streakCounter = 0f
+                        Log.d("Streak","$streakCounter")
+                    }
 
                     if (currentWeekNumber != previousWeekNumber) {
                         stepsGraphViewModel.deleteEntries()
@@ -163,6 +175,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
+                        saveData(STREAK_COUNTER, streakCounter)
                         hydrationViewModel.numberGoal.value?.toFloat()?.let {
                             saveData(HYDRATION_TARGET, it)
                         }
@@ -245,6 +258,9 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
             val savedWeekNumber = loadData(STEPS_WEEK_PREFERENCES)
             previousWeekNumber = savedWeekNumber ?: 0f
+
+            val savedStreaks = loadData(STREAK_COUNTER)
+            streakCounter = savedStreaks ?: 0f
 
             loadData(STEPS_TARGET_PREFERENCES)?.let {
                 stepCounterViewModel.onTargetStepsIndexUpdate(it)
