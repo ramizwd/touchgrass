@@ -22,8 +22,8 @@ object HomeConstants {
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
     val currentMinutes by viewModel.currentTotalMinutes.observeAsState()
-
-    HomeScreenBody(navController = navController, currentMinutes = currentMinutes)
+    val streaks by viewModel.streaks.observeAsState()
+    HomeScreenBody(navController = navController, currentMinutes = currentMinutes,streaks = streaks)
 }
 
 /**
@@ -32,7 +32,8 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 @Composable
 fun HomeScreenBody(
     navController: NavController,
-    currentMinutes: Int?
+    currentMinutes: Int?,
+    streaks: Float?
 ) {
 
     Column(
@@ -62,6 +63,7 @@ fun HomeScreenBody(
                 .weight(1f)
         ) {
             Column {
+                Text(text = streaks.toString())
                 Button(onClick = {
                     navController.navigate(Navigation.STEP_COUNTER)
                 }) { Text(text = "STEP COUNTER") }
