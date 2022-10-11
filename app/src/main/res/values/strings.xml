@@ -8,4 +8,5 @@
     <string name="connected_bt">Connected</string>
     <string name="hr_bpm_txt">%d BPM</string>
     <string name="unknown_bt_device">Unknown device</string>
+    <string name="step_sensor_not_found">Step sensor not found.</string>
 </resources>

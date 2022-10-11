@@ -1,20 +1,38 @@
 package com.example.touchgrass.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationCompat
 import com.example.touchgrass.R
+import com.example.touchgrass.utils.Constants.ACTION_START_SERVICE
+import com.example.touchgrass.utils.Constants.ACTION_STOP_SERVICE
+import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_ID
+import com.example.touchgrass.utils.Constants.NOTIFICATION_ID
+import com.example.touchgrass.utils.Constants.SENSOR_STEPS_TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 
-class StepCounterService: Service() {
+
+class StepCounterService: Service(), SensorEventListener {
     companion object {
-        const val ACTION_START = "ACTION_START"
-        const val ACTION_STOP = "ACTION_STOP"
+        private lateinit var sensorManager: SensorManager
+        private var stepCounter: Sensor? = null
+        var totalSteps = 0f
+        var isSensorOn by mutableStateOf(false)
+
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -23,40 +41,71 @@ class StepCounterService: Service() {
         return null
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent?.action) {
-            ACTION_START -> start()
-            ACTION_STOP -> stop()
+            ACTION_START_SERVICE -> start()
+            ACTION_STOP_SERVICE -> stop()
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
     private fun start() {
-        val notification = NotificationCompat.Builder(this, "steps")
+        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Tracking steps...")
-            .setContentText("Steps count: null")
-            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setSmallIcon(R.drawable.ic_walking)
+            .setSilent(true)
             .setOngoing(true)
-        Log.d("SERVICE123", "HERE")
-        startForeground(1, notification.build())
 
+        registerStepCounterSensor()
 
-
-
+        startForeground(NOTIFICATION_ID, notification.build())
     }
 
     private fun stop() {
+        unregisterStepCounterSensor()
         stopForeground(true)
         stopSelf()
     }
 
+    private fun registerStepCounterSensor() {
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
+            stepCounter?.also {
+                sensorManager.registerListener(
+                    this,
+                    it,
+                    SensorManager.SENSOR_DELAY_FASTEST
+                )
+            }
+        } else {
+            Toast.makeText(this,
+                getString(R.string.step_sensor_not_found),
+                Toast.LENGTH_LONG).show()
+        }
+        isSensorOn = true
+    }
+
+    private fun unregisterStepCounterSensor() {
+        if (isSensorOn) {
+            sensorManager.unregisterListener(this)
+            isSensorOn = false
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
     }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event ?: return
+        event.values.firstOrNull()?.let {
+            Log.d(SENSOR_STEPS_TAG, "Count: $it")
+            totalSteps = it
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+
 }
