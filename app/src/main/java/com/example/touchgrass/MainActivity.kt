@@ -9,9 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -144,7 +142,6 @@ class MainActivity : ComponentActivity() {
                 if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
 
                     if (currentWeekNumber != previousWeekNumber){
-
                         stepsGraphViewModel.deleteEntries()
                         for (dayOfWeek in 1..7){
                             stepsGraphViewModel.insertEntry(StepsGraph(dayOfWeek.toFloat(), 0f))
