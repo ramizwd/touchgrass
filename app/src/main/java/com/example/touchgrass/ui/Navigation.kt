@@ -44,18 +44,23 @@ fun Navigation(
             )
         }
         composable(Navigation.HYDRATION) {
-            HydrationScreen(hydrationViewModel = hydrationViewModel)
+            HydrationScreen(
+                hydrationViewModel = hydrationViewModel,
+                navController = navController,
+            )
         }
         composable(Navigation.STEP_COUNTER) {
             StepCounterScreen(
                 viewModel = stepCounterViewModel,
                 stepsGraphViewModel = stepsGraphViewModel,
+                navController = navController,
             )
         }
         composable(Navigation.HEART_RATE_MONITOR) {
             HeartRateMonitorScreen(
                 viewModel = heartRateMonitorViewModel,
-                bluetoothAdapter = bluetoothAdapter
+                bluetoothAdapter = bluetoothAdapter,
+                navController = navController,
             )
         }
     }

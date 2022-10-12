@@ -20,11 +20,6 @@ import com.example.touchgrass.utils.Constants.ACTION_STOP_SERVICE
 import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.touchgrass.utils.Constants.NOTIFICATION_ID
 import com.example.touchgrass.utils.Constants.SENSOR_STEPS_TAG
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-
 
 class StepCounterService: Service(), SensorEventListener {
     companion object {
@@ -32,10 +27,8 @@ class StepCounterService: Service(), SensorEventListener {
         private var stepCounter: Sensor? = null
         var totalSteps = 0f
         var isSensorOn by mutableStateOf(false)
-
+            private set
     }
-
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -51,19 +44,18 @@ class StepCounterService: Service(), SensorEventListener {
 
     private fun start() {
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Tracking steps...")
+            .setContentTitle("Counting your steps...")
             .setSmallIcon(R.drawable.ic_walking)
             .setSilent(true)
             .setOngoing(true)
 
         registerStepCounterSensor()
-
         startForeground(NOTIFICATION_ID, notification.build())
     }
 
     private fun stop() {
         unregisterStepCounterSensor()
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
@@ -79,12 +71,13 @@ class StepCounterService: Service(), SensorEventListener {
                     SensorManager.SENSOR_DELAY_FASTEST
                 )
             }
+            isSensorOn = true
         } else {
             Toast.makeText(this,
                 getString(R.string.step_sensor_not_found),
                 Toast.LENGTH_LONG).show()
+            stop()
         }
-        isSensorOn = true
     }
 
     private fun unregisterStepCounterSensor() {
@@ -92,10 +85,6 @@ class StepCounterService: Service(), SensorEventListener {
             sensorManager.unregisterListener(this)
             isSensorOn = false
         }
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-        serviceScope.cancel()
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
