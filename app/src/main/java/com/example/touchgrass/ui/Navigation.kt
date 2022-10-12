@@ -29,7 +29,7 @@ fun Navigation(
     heartRateMonitorViewModel: HeartRateMonitorViewModel,
     bluetoothAdapter: BluetoothAdapter?,
     hydrationViewModel: HydrationViewModel,
-    stepsGraphViewModel: StepsGraphViewModel
+    stepsGraphViewModel: StepsGraphViewModel,
 ) {
     val navController = rememberNavController()
 
@@ -44,18 +44,23 @@ fun Navigation(
             )
         }
         composable(Navigation.HYDRATION) {
-            HydrationScreen(hydrationViewModel = hydrationViewModel)
+            HydrationScreen(
+                hydrationViewModel = hydrationViewModel,
+                navController = navController,
+            )
         }
         composable(Navigation.STEP_COUNTER) {
             StepCounterScreen(
                 viewModel = stepCounterViewModel,
-                stepsGraphViewModel = stepsGraphViewModel
+                stepsGraphViewModel = stepsGraphViewModel,
+                navController = navController,
             )
         }
         composable(Navigation.HEART_RATE_MONITOR) {
             HeartRateMonitorScreen(
                 viewModel = heartRateMonitorViewModel,
-                bluetoothAdapter = bluetoothAdapter
+                bluetoothAdapter = bluetoothAdapter,
+                navController = navController,
             )
         }
     }
