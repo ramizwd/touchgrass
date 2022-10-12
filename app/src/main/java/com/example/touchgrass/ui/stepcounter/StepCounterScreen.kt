@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.service.StepCounterService.Companion.isSensorOn
@@ -79,12 +80,15 @@ fun StepCounterScreenBody(
                 actions = {
                     Text(
                         text = stringResource(R.string.set_steps_target),
-                        modifier = Modifier.selectable(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .selectable(
                                 selected = true,
                                 onClick = {
                                     onExpanded(true)
                                 }
                             )
+
                     )
                 }
             )
@@ -99,7 +103,7 @@ fun StepCounterScreenBody(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 Column {
                     CircularProgressBar(

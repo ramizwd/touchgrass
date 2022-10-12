@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.touchgrass.R
@@ -62,7 +61,7 @@ fun HomeScreenBody(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -71,7 +70,6 @@ fun HomeScreenBody(
                     CircularProgressBar(
                         percentage = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
                         number = 0,
-                        color = if ((currentMinutes ?: 0) == 0) Color.Red else Color.Black
                     )
                 }
             }

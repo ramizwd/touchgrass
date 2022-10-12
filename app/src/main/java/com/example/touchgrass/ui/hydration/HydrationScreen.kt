@@ -104,7 +104,9 @@ fun HydrationScreenBody(
                 },
                 actions = {
                     Text(text = stringResource(R.string.set_hydration_target),
-                        modifier = Modifier.selectable(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .selectable(
                             selected = true,
                             onClick = {
                                 onExpanded(true)
@@ -123,7 +125,7 @@ fun HydrationScreenBody(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 Box(
                     modifier = Modifier
