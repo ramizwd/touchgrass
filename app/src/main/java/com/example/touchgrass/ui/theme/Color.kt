@@ -2,7 +2,8 @@ package com.example.touchgrass.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+
+val SCGreen = Color(0xFF8ACB88)
+val SCDarkGreen = Color(0xFF5A9A5A)
+val SCOrange = Color(0xFFF0A202)
+//val SCLightOrange = Color(0xFFFFD349)
