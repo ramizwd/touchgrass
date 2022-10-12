@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import com.example.touchgrass.utils.Constants
 import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_NAME
 
