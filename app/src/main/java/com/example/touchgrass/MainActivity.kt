@@ -40,12 +40,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.temporal.WeekFields
 
-
 class MainActivity : ComponentActivity() {
     companion object {
-        private var bluetoothAdapter: BluetoothAdapter? = null
-
         private val Context.dataStore by preferencesDataStore(name = STEPS_PREFERENCES)
+
+        private var bluetoothAdapter: BluetoothAdapter? = null
 
         private lateinit var stepCounterViewModel: StepCounterViewModel
         private lateinit var homeViewModel: HomeViewModel
@@ -107,9 +106,8 @@ class MainActivity : ComponentActivity() {
     /**
      * Handler for getting the time and changing variables based on the it.
      */
-    private fun updateStepsAndTimer() {
+    private fun timerHandler() {
         val timeHandler = Handler(mainLooper)
-
         timeHandler.postDelayed(object : Runnable {
             override fun run() {
                 val dateNow = LocalDateTime.now()
@@ -135,16 +133,14 @@ class MainActivity : ComponentActivity() {
                     stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
                 }
 
-                if (previousTotalSteps == 0f) {
-                    previousTotalSteps = totalSteps
-                }
-
-                if (currentDayOfMonth != previousDayOfMonth || currentWeekNumber != previousWeekNumber) {
+                if (currentDayOfMonth != previousDayOfMonth ||
+                    currentWeekNumber != previousWeekNumber) {
 
                     if (currentWeekNumber != previousWeekNumber){
                         stepsGraphViewModel.deleteEntries()
                         for (dayOfWeek in 1..7){
-                            stepsGraphViewModel.insertEntry(StepsGraph(dayOfWeek.toFloat(), 0f))
+                            stepsGraphViewModel
+                                .insertEntry(StepsGraph(dayOfWeek.toFloat(), 0f))
                         }
                         previousWeekNumber = currentWeekNumber
                     }
@@ -227,7 +223,7 @@ class MainActivity : ComponentActivity() {
                 hydrationViewModel.onDrankAmountUpdate(it.toInt())
             }
 
-            updateStepsAndTimer()
+            timerHandler()
         }
     }
 }
