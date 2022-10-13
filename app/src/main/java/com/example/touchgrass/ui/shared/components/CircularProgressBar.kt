@@ -107,7 +107,10 @@ fun CircularProgressBar(
                 )
             }
             if (!isHydrationScreen) {
-                val contentDesc = stringResource(if (!isSensorOn) R.string.enable_step_sensor else R.string.disable_step_sensor)
+                val contentDesc = stringResource(
+                    if (!isSensorOn) R.string.enable_step_sensor
+                    else R.string.disable_step_sensor
+                )
                 FloatingActionButton(onClick = {
                     StepCounterServiceHelper.launchForegroundService(
                         context = context,
@@ -115,23 +118,43 @@ fun CircularProgressBar(
                         else Constants.ACTION_START_SERVICE
                     )
                 },
-                    modifier = Modifier.size(54.dp).align(Alignment.BottomCenter)
+                    modifier = Modifier
+                        .size(54.dp)
+                        .align(Alignment.BottomCenter)
                 ) {
                     Icon(painterResource(
                         if (isSensorOn) R.drawable.ic_pause
                         else R.drawable.ic_play_arrow),
                         contentDesc,
-                        Modifier.fillMaxSize().padding(4.dp))
+                        Modifier
+                            .fillMaxSize()
+                            .padding(4.dp))
                 }
             }
         } else {
-            Text(text = if(streak != null) "${streak.toInt()}" else "0")
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = if (streak != null) "${streak.toInt()}" else "0",
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.streak),
+                    fontWeight = FontWeight.Light
+                )
+            }
             Icon(
-                imageVector = Icons.Filled.Person,
+
+                painter = painterResource(R.drawable.ic_snail),
+                tint = Color.Unspecified,
                 contentDescription = stringResource(R.string.snail_ic_desc),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .size(42.dp)
+                    .size(64.dp)
+
             )
         }
     }
