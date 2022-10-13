@@ -44,6 +44,7 @@ fun CircularProgressBar(
     animationDelay: Int = 0,
     isSensorOn: Boolean = false,
     isHydrationScreen: Boolean = false,
+    streak: Float? = 0f
 ) {
     val context = LocalContext.current
 
@@ -88,6 +89,7 @@ fun CircularProgressBar(
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
         }
+
         if (target != 0) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -123,6 +125,7 @@ fun CircularProgressBar(
                 }
             }
         } else {
+            Text(text = if(streak != null) "${streak.toInt()}" else "0")
             Icon(
                 imageVector = Icons.Filled.Person,
                 contentDescription = stringResource(R.string.snail_ic_desc),

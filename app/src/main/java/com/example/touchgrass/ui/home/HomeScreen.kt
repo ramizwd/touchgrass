@@ -29,10 +29,12 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ) {
     val currentMinutes by viewModel.currentTotalMinutes.observeAsState()
+    val streak by viewModel.streak.observeAsState()
 
     HomeScreenBody(
         navController = navController,
-        currentMinutes = currentMinutes
+        currentMinutes = currentMinutes,
+        streak = streak
     )
 }
 
@@ -42,7 +44,8 @@ fun HomeScreen(
 @Composable
 fun HomeScreenBody(
     navController: NavController,
-    currentMinutes: Int?
+    currentMinutes: Int?,
+    streak: Float?
 ) {
 
     Scaffold(
@@ -70,6 +73,7 @@ fun HomeScreenBody(
                     CircularProgressBar(
                         value = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
                         target = 0,
+                        streak = streak
                     )
                 }
             }
