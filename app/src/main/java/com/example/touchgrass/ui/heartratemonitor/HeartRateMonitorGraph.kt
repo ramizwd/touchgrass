@@ -15,7 +15,7 @@ import com.github.mikephil.charting.data.LineDataSet
 fun HeartRateGraph(hr: Float?, sec: Float?) {
 
     val dataSets = remember { mutableStateListOf<Entry>() }
-    hr?.let {
+    if (hr != null && hr != 0f) {
         dataSets.add(Entry(sec ?: 0f, hr))
     }
 

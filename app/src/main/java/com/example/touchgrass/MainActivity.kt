@@ -142,6 +142,8 @@ class MainActivity : ComponentActivity() {
                     stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                     stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
                     previousCountedSteps = currentSteps
+                } else {
+                    stepCounterViewModel.onStepsUpdate(previousCountedSteps.toInt())
                 }
 
                 if (currentDayOfYear != previousDayOfYear ||

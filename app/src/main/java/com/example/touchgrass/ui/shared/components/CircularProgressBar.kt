@@ -61,9 +61,9 @@ fun CircularProgressBar(
 
     val animatedTextColor by animateColorAsState(
         targetValue = if (isSensorOn)
-            Color.Black
+            MaterialTheme.colors.onPrimary
         else
-            Color.Gray,
+            MaterialTheme.colors.onPrimary.copy(alpha = 0.4f),
         animationSpec = tween(1000)
     )
 
@@ -97,11 +97,13 @@ fun CircularProgressBar(
                     text = "${(curPercentage.value * target).toInt()}",
                     fontSize = fontSize,
                     fontWeight = FontWeight.Bold,
-                    color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                    color = if (!isHydrationScreen) animatedTextColor
+                    else MaterialTheme.colors.onPrimary
                 )
                 Text(
                     text = "/$target",
-                    color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                    color = if (!isHydrationScreen) animatedTextColor
+                    else MaterialTheme.colors.onPrimary
                 )
             }
             if (!isHydrationScreen) {
