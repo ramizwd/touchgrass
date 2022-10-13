@@ -14,4 +14,8 @@
     <string name="hr_monitor">Heart Rate Monitor</string>
     <string name="set_steps_target">Set Steps Target</string>
     <string name="set_hydration_target">Set Hydration Target</string>
+    <string name="back_arrow_ic_desc">Back Arrow</string>
+    <string name="snail_ic_desc">snail</string>
+    <string name="enable_step_sensor">Enable step counter sensor</string>
+    <string name="disable_step_sensor">Disable step counter sensor</string>
 </resources>

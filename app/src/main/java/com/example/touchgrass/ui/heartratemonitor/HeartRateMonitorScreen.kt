@@ -27,8 +27,6 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.navigation.NavController
 import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.R
-import com.example.touchgrass.ui.shared.components.CircularProgressBar
-import com.example.touchgrass.utils.Constants.BACK_ARROW_IC_DESC
 
 @Composable
 fun HeartRateMonitorScreen(
@@ -112,7 +110,7 @@ fun HeartRateMonitorBody(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = BACK_ARROW_IC_DESC
+                            contentDescription = stringResource(R.string.back_arrow_ic_desc)
                         )
 
                     }

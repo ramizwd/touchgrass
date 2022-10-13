@@ -68,8 +68,8 @@ fun HomeScreenBody(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressBar(
-                        percentage = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
-                        number = 0,
+                        value = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
+                        target = 0,
                     )
                 }
             }
