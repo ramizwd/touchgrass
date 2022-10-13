@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -146,8 +145,8 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (currentDayOfYear != previousDayOfYear ||
-                    currentWeekNumber != previousWeekNumber
-                ) {
+                    currentWeekNumber != previousWeekNumber) {
+
                     if (currentWeekNumber != previousWeekNumber) {
                         stepsGraphViewModel.deleteEntries()
                         for (dayOfWeek in 1..7) {
@@ -169,7 +168,7 @@ class MainActivity : ComponentActivity() {
                             streakCounter = 0f
                             homeViewModel.onStreaksUpdate(streakCounter)
                         }
-                    }else {
+                    } else {
                         streakCounter = 0f
                         homeViewModel.onStreaksUpdate(streakCounter)
                     }

@@ -27,7 +27,6 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.navigation.NavController
 import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.R
-import com.example.touchgrass.utils.Constants.BACK_ARROW_IC_DESC
 
 @Composable
 fun HeartRateMonitorScreen(
@@ -111,7 +110,7 @@ fun HeartRateMonitorBody(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = BACK_ARROW_IC_DESC
+                            contentDescription = stringResource(R.string.back_arrow_ic_desc)
                         )
 
                     }
@@ -128,7 +127,7 @@ fun HeartRateMonitorBody(
                 contentAlignment = Alignment.TopCenter,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -155,7 +154,7 @@ fun HeartRateMonitorBody(
                     ) { Text(text = stringResource(R.string.scan_bt_btn)) }
 
                     if (btScanning) {
-                        Text(text = stringResource(R.string.scanning_bt_txt))
+                        CircularProgressIndicator()
                     } else {
                         if (result != null && result.isEmpty()) {
                             Text(text = stringResource(R.string.no_devices_found_bt))
