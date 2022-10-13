@@ -33,7 +33,7 @@ fun StepCounterScreen(
     var expanded by remember { mutableStateOf(false) }
     val targetStepsList = mutableListOf<Int>()
 
-    for (i in 1000..50000 step 1000) targetStepsList.add(i)
+    for (i in 8..50000 step 1000) targetStepsList.add(i)
     var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
@@ -63,7 +63,7 @@ fun StepCounterScreenBody(
     navController: NavController,
 ) {
     val context = LocalContext.current
-
+    viewModel.onTargetStepsValueUpdate(stepsTarget)
     Scaffold(
         topBar = {
             TopAppBar(
@@ -139,6 +139,7 @@ fun StepCounterScreenBody(
                 targetStepsList.forEachIndexed { index, value ->
                     DropdownMenuItem(onClick = {
                         viewModel.onTargetStepsIndexUpdate(index.toFloat())
+                        viewModel.onTargetStepsValueUpdate(value.toFloat())
                         onSelectedIndex(index)
                         onExpanded(false)
                     }) {
