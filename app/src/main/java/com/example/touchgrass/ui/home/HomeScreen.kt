@@ -13,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.toUpperCase
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.ui.Navigation
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
+import java.util.*
 
 object HomeConstants {
     const val TOTAL_MINUTES_OF_DAY = 1440f
@@ -90,13 +92,13 @@ fun HomeScreenBody(
                 Column {
                     Button(onClick = {
                         navController.navigate(Navigation.STEP_COUNTER)
-                    }) { Text(text = "STEP COUNTER") }
+                    }) { Text(text = stringResource(R.string.step_counter).uppercase()) }
                     Button(onClick = {
                         navController.navigate(Navigation.HYDRATION)
-                    }) { Text(text = "HYDRATION") }
+                    }) { Text(text = stringResource(R.string.hydration).uppercase()) }
                     Button(onClick = {
                         navController.navigate(Navigation.HEART_RATE_MONITOR)
-                    }) { Text(text = "HEART RATE MONITOR") }
+                    }) { Text(text = stringResource(R.string.hr_monitor).uppercase()) }
                 }
             }
         }
