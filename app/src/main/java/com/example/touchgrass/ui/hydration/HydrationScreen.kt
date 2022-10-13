@@ -3,11 +3,9 @@ package com.example.touchgrass.ui.hydration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -55,10 +53,23 @@ fun HydrationScreen(
     var numberGoal by remember { mutableStateOf(hydrationTarget ?: DefaultValue.THREE_THOUSAND) }
     var liquidAmount by remember { mutableStateOf(DefaultValue.CUP_SIZE) }
 
+    val list: List<String> = listOf(
+        "100",
+        "200",
+        "300",
+        "400",
+        "500",
+        "600",
+        "700",
+        "800",
+        "900",
+        "1000"
+    )
     HydrationScreenBody(
         hydrationViewModel,
         waterTaken,
         itemAmount,
+        list,
         numberGoal = numberGoal,
         onNumberGoalChange = { numberGoal = it },
         liquidAmount = liquidAmount,
@@ -77,6 +88,7 @@ fun HydrationScreenBody(
     hydrationViewModel: HydrationViewModel,
     waterTaken: Int?,
     itemAmount: Int?,
+    list: List<String>,
     numberGoal: Int,
     onNumberGoalChange: (Int) -> Unit,
     liquidAmount: Int,
@@ -86,18 +98,7 @@ fun HydrationScreenBody(
     navController: NavController
 ) {
     var stateSlider by remember { mutableStateOf(200f) }
-    val list: List<String> = listOf(
-        "100",
-        "200",
-        "300",
-        "400",
-        "500",
-        "600",
-        "700",
-        "800",
-        "900",
-        "1000"
-    )
+
     hydrationViewModel.onItemsAmountUpdate(
         if ((waterTaken ?: 0) < numberGoal)
             if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) (numberGoal - (waterTaken
@@ -182,31 +183,21 @@ fun HydrationScreenBody(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-
                 Column {
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(9.dp)
                     ) {
-                        items(10) {
-                            val values = DefaultValue.ONE_HUNDRED * (it + 1)
-                            Button(
-                                onClick = {
-                                    onChangeLiquid(values)
-                                },
-                                shape = RoundedCornerShape(50),
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .fillMaxWidth(),
-                            ) {
-                                Text(text = "$values ml")
-                            }
-                        }
-                    }
+                        Icon(
+                            painterResource(R.drawable.ic_water_glass),
+                            contentDescription = null,
+                            modifier = Modifier.size(37.dp),
+                            tint = Color.Unspecified
+                        )
                         Box(
                             contentAlignment = Alignment.Center,
+                            modifier = Modifier.weight(1f)
                         ) {
-                            sliderLabel(values = list)
+                            SliderLabel(values = list)
                             Slider(
                                 value = stateSlider,
                                 onValueChange = { stateSlider = it },
@@ -215,8 +206,15 @@ fun HydrationScreenBody(
                                 onValueChangeFinished = {
                                     onChangeLiquid((stateSlider).toInt())
                                 })
-
                         }
+
+                        Icon(
+                            painterResource(R.drawable.ic_water_bottle),
+                            contentDescription = null,
+                            modifier = Modifier.size(42.dp),
+                            tint = Color.Unspecified
+                        )
+                    }
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(4),
                         contentPadding = PaddingValues(
@@ -243,7 +241,7 @@ fun HydrationScreenBody(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            painterResource(R.drawable.ic_water_glass_color_icon),
+                                            painterResource(R.drawable.ic_water_glass),
                                             contentDescription = null,
                                             modifier = Modifier.size(37.dp),
                                             tint = Color.Unspecified
@@ -260,8 +258,9 @@ fun HydrationScreenBody(
     }
 }
 
+
 @Composable
-fun sliderLabel(values: List<String>) {
+fun SliderLabel(values: List<String>) {
     val textSize = with(LocalDensity.current) { 11.dp.toPx() }
     val padding = with(LocalDensity.current) { 10.dp.toPx() }
 
@@ -286,7 +285,6 @@ fun sliderLabel(values: List<String>) {
                         .minus(lineHeightDp.div(2))
                 )
         ) {
-
             val yStart = 0f
             val distance = (size.width.minus(2 * padding)).div(values.size.minus(1))
 
