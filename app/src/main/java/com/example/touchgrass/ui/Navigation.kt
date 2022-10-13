@@ -35,7 +35,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = Navigation.HYDRATION,
+        startDestination = Navigation.HOME,
     ) {
         composable(Navigation.HOME) {
             HomeScreen(
