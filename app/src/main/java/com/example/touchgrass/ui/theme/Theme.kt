@@ -10,12 +10,14 @@ private val DarkColorPalette = darkColors(
     primary = SCGreen,
     primaryVariant = SCDarkGreen,
     secondary = SCOrange,
+    onPrimary = SCWhite,
 )
 
 private val LightColorPalette = lightColors(
     primary = SCGreen,
     primaryVariant = SCDarkGreen,
     secondary = SCOrange,
+    onPrimary = SCBlack,
 
     /* Other default colors to override
     background = Color.White,
