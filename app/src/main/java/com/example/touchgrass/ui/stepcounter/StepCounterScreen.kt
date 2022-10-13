@@ -63,7 +63,7 @@ fun StepCounterScreenBody(
     navController: NavController,
 ) {
     val context = LocalContext.current
-
+    viewModel.onTargetStepsValueUpdate(stepsTarget)
     Scaffold(
         topBar = {
             TopAppBar(
@@ -139,6 +139,7 @@ fun StepCounterScreenBody(
                 targetStepsList.forEachIndexed { index, value ->
                     DropdownMenuItem(onClick = {
                         viewModel.onTargetStepsIndexUpdate(index.toFloat())
+                        viewModel.onTargetStepsValueUpdate(value.toFloat())
                         onSelectedIndex(index)
                         onExpanded(false)
                     }) {

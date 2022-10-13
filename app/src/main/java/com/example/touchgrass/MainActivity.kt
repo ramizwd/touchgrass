@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import com.example.touchgrass.utils.Constants.STEPS_DAY_PREFERENCES
 import com.example.touchgrass.utils.Constants.STEPS_PREFERENCES
 import com.example.touchgrass.utils.Constants.STEPS_TARGET_PREFERENCES
 import com.example.touchgrass.utils.Constants.STEPS_WEEK_PREFERENCES
+import com.example.touchgrass.utils.Constants.STREAK_COUNTER
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -58,8 +60,10 @@ class MainActivity : ComponentActivity() {
     private var currentDayOfMonth = 0f
     private var currentWeekNumber = 0f
     private var previousWeekNumber = 0f
-
-
+    private var streakCounter = 0f
+    private var previousSteps = 0f
+    private var targetedSteps = 0f
+    private var currentSteps = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +77,12 @@ class MainActivity : ComponentActivity() {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
-        if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACTIVITY_RECOGNITION) !=
-                    PackageManager.PERMISSION_GRANTED)) {
+        if ((ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) !=
+                    PackageManager.PERMISSION_GRANTED)
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
@@ -117,7 +124,7 @@ class MainActivity : ComponentActivity() {
                 val weekFields = WeekFields.ISO
                 val currentHour = dateNow.hour
                 val currentMinute = dateNow.minute
-                val currentSteps: Float
+
 
                 currentDayOfMonth = dateNow.dayOfMonth.toFloat()
                 currentWeekNumber = dateNow.get(weekFields.weekOfWeekBasedYear()).toFloat()
@@ -137,20 +144,30 @@ class MainActivity : ComponentActivity() {
 
 
                 if (currentDayOfMonth != previousDayOfMonth ||
-                    currentWeekNumber != previousWeekNumber) {
-
-                    if (currentWeekNumber != previousWeekNumber){
+                    currentWeekNumber != previousWeekNumber
+                ) {
+                    if (currentWeekNumber != previousWeekNumber) {
                         stepsGraphViewModel.deleteEntries()
-                        for (dayOfWeek in 1..7){
+                        for (dayOfWeek in 1..7) {
                             stepsGraphViewModel
                                 .insertEntry(StepsGraph(dayOfWeek.toFloat(), 0f))
                         }
                         previousWeekNumber = currentWeekNumber
                     }
 
+                    if (previousDayOfMonth == currentDayOfMonth - 1) {
+                        if (targetedSteps <= previousSteps) {
+                            streakCounter++
+                            previousSteps = 0f
+                        } else {
+                            streakCounter = 0f
+                        }
+                    }
+
                     previousTotalSteps = totalSteps
                     previousDayOfMonth = currentDayOfMonth
                     hydrationViewModel.onDrankAmountUpdate(0)
+
 
                     // For the perms popup
                     lifecycleScope.launch {
@@ -158,6 +175,10 @@ class MainActivity : ComponentActivity() {
                         saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
                         saveData(STREAK_COUNTER, streakCounter)
+                        saveData("current_step", currentSteps)
+                        stepCounterViewModel.targetStepsValue.value?.toFloat()?.let {
+                            saveData("targeted_steps", it)
+                        }
                         hydrationViewModel.numberGoal.value?.toFloat()?.let {
                             saveData(HYDRATION_TARGET_PREFERENCES, it)
                         }
@@ -193,6 +214,7 @@ class MainActivity : ComponentActivity() {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
             saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
             saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
+            saveData("current_step", currentSteps)
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }
@@ -219,6 +241,12 @@ class MainActivity : ComponentActivity() {
 
             val savedStreaks = loadData(STREAK_COUNTER)
             streakCounter = savedStreaks ?: 0f
+
+            val savedPreviousSteps = loadData("current_step")
+            previousSteps = savedPreviousSteps ?: 0f
+
+            val savedTargetedSteps = loadData("targeted_steps")
+            targetedSteps = savedTargetedSteps ?: 0f
 
             loadData(STEPS_TARGET_PREFERENCES)?.let {
                 stepCounterViewModel.onTargetStepsIndexUpdate(it)
