@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
-import com.example.touchgrass.utils.Constants.BACK_ARROW_IC_DESC
 
 /**
  * Stateful Composable which manages state
@@ -116,13 +115,15 @@ fun HydrationScreenBody(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = BACK_ARROW_IC_DESC
+                            contentDescription = stringResource(R.string.back_arrow_ic_desc)
                         )
                     }
                 },
                 actions = {
                     Text(text = stringResource(R.string.set_hydration_target),
-                        modifier = Modifier.selectable(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .selectable(
                             selected = true,
                             onClick = {
                                 onExpanded(true)
@@ -141,7 +142,7 @@ fun HydrationScreenBody(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 Box(
                     modifier = Modifier
@@ -170,9 +171,13 @@ fun HydrationScreenBody(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressBar(
-                        percentage = (waterTaken ?: 0) / numberGoal.toFloat(),
-                        number = numberGoal,
-                        color = if ((waterTaken ?: 0) >= numberGoal) Color.Green else Color.Blue
+                        value = (waterTaken ?: 0) / numberGoal.toFloat(),
+                        target = numberGoal,
+                        foregroundColor = if ((waterTaken ?: 0) >= numberGoal)
+                            MaterialTheme.colors.primary
+                        else
+                            Color(0xFF48C1EC),
+                        isHydrationScreen = true,
                     )
                 }
             }
