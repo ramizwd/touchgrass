@@ -16,11 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.service.StepCounterService.Companion.isSensorOn
-import com.example.touchgrass.service.StepCounterServiceHelper
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
-import com.example.touchgrass.utils.Constants.ACTION_START_SERVICE
-import com.example.touchgrass.utils.Constants.ACTION_STOP_SERVICE
-import com.example.touchgrass.utils.Constants.BACK_ARROW_IC_DESC
 
 @Composable
 fun StepCounterScreen(
@@ -63,7 +59,7 @@ fun StepCounterScreenBody(
     onSelectedIndex: (Int) -> Unit,
     navController: NavController,
 ) {
-    val context = LocalContext.current
+//    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -73,7 +69,7 @@ fun StepCounterScreenBody(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = BACK_ARROW_IC_DESC
+                            contentDescription = stringResource(R.string.back_arrow_ic_desc)
                         )
                     }
                 },
@@ -105,19 +101,23 @@ fun StepCounterScreenBody(
                     .fillMaxWidth()
                     .weight(1.5f)
             ) {
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     CircularProgressBar(
-                        percentage = (steps ?: 0) / stepsTarget,
-                        number = stepsTarget.toInt(),
-                        color = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Yellow
+                        value = (steps ?: 0) / stepsTarget,
+                        target = stepsTarget.toInt(),
+                        foregroundColor = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Yellow,
+                        isSensorOn = isSensorOn,
                     )
-                    Button(onClick = {
-                        StepCounterServiceHelper.launchForegroundService(
-                            context = context,
-                            action = if (isSensorOn) ACTION_STOP_SERVICE
-                            else ACTION_START_SERVICE
-                        )
-                    }) { Text(text = if (isSensorOn) "STOP" else "START") }
+//                    Button(onClick = {
+//                        StepCounterServiceHelper.launchForegroundService(
+//                            context = context,
+//                            action = if (isSensorOn) ACTION_STOP_SERVICE
+//                            else ACTION_START_SERVICE
+//                        )
+//                    }) { Text(text = if (isSensorOn) "STOP" else "START") }
                 }
             }
             Box(
