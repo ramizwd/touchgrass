@@ -35,7 +35,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = Navigation.HOME,
+        startDestination = Navigation.STEP_COUNTER,
     ) {
         composable(Navigation.HOME) {
             HomeScreen(
