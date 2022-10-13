@@ -5,7 +5,7 @@
     <string name="scan_bt_btn">SCAN FOR DEVICES</string>
     <string name="no_devices_found_bt">No devices found.</string>
     <string name="connected_bt">Connected</string>
-    <string name="hr_bpm_txt">%d BPM</string>
+    <string name="hr_bpm_txt" translatable="false">%d BPM</string>
     <string name="unknown_bt_device">Unknown device</string>
     <string name="step_sensor_not_found">Step sensor not found.</string>
     <string name="home">Home</string>
