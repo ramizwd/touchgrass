@@ -1,5 +1,6 @@
 package com.example.touchgrass.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
@@ -30,9 +31,13 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ) {
     val currentMinutes by viewModel.currentTotalMinutes.observeAsState()
+    val streak by viewModel.streak.observeAsState()
 
-    val streaks by viewModel.streaks.observeAsState()
-    HomeScreenBody(navController = navController, currentMinutes = currentMinutes,streaks = streaks)
+    HomeScreenBody(
+        navController = navController,
+        currentMinutes = currentMinutes,
+        streak = streak
+    )
 
 }
 
@@ -43,7 +48,7 @@ fun HomeScreen(
 fun HomeScreenBody(
     navController: NavController,
     currentMinutes: Int?,
-    streaks: Float?
+    streak: Float?
 ) {
 
     Scaffold(
@@ -71,7 +76,8 @@ fun HomeScreenBody(
                     CircularProgressBar(
                         percentage = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
                         number = 0,
-                        color = if ((currentMinutes ?: 0) == 0) Color.Red else Color.Black
+                        color = if ((currentMinutes ?: 0) == 0) Color.Red else Color.Black,
+                        streak = streak
                     )
                 }
             }

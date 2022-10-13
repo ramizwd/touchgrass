@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -27,7 +28,8 @@ fun CircularProgressBar(
     color: Color = Color.Blue,
     strokeWidth: Dp = 16.dp,
     animationDuration: Int = 1000,
-    animationDelay: Int = 0
+    animationDelay: Int = 0,
+    streak: Float? = 0f
 ) {
     var animationPlayed by remember { mutableStateOf(false) }
     val curPercentage = animateFloatAsState(
@@ -60,9 +62,13 @@ fun CircularProgressBar(
             )
 
         }
+        Column() {
+
         Text(text = (if (number == 0) "Time remaining" else "${(curPercentage.value * number).toInt()}/$number"),
             color = Color.Black,
             fontSize = fontSize,
             fontWeight = FontWeight.Medium)
+        Text(text = if(streak != null) "${streak.toInt()}" else "0")
+        }
     }
 }
