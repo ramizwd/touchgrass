@@ -3,10 +3,10 @@
     <string name="enable_bt_toast">Please enable Bluetooth</string>
     <string name="device_does_not_support_bt">This device does not support Bluetooth.</string>
     <string name="scan_bt_btn">SCAN</string>
-    <string name="scanning_bt_txt">SCANNING…</string>
+    <string name="scanning_bt_txt" translatable="false">SCANNING…</string>
     <string name="no_devices_found_bt">No devices found.</string>
     <string name="connected_bt">Connected</string>
-    <string name="hr_bpm_txt">%d BPM</string>
+    <string name="hr_bpm_txt" translatable="false">%d BPM</string>
     <string name="unknown_bt_device">Unknown device</string>
     <string name="step_sensor_not_found">Step sensor not found.</string>
     <string name="home">Home</string>

@@ -1,5 +1,6 @@
 package com.example.touchgrass.ui.hydration
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
 import com.example.touchgrass.utils.Constants.BACK_ARROW_IC_DESC
+import kotlin.math.roundToInt
 
 /**
  * Stateful Composable which manages state
@@ -185,10 +187,12 @@ fun HydrationScreenBody(
             ) {
                 Column {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(9.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(9.dp)
                     ) {
                         Icon(
-                            painterResource(R.drawable.ic_water_glass),
+                            painter = painterResource(R.drawable.ic_water_glass),
                             contentDescription = null,
                             modifier = Modifier.size(37.dp),
                             tint = Color.Unspecified
@@ -204,19 +208,19 @@ fun HydrationScreenBody(
                                 steps = 8,
                                 valueRange = 100f..1000f,
                                 onValueChangeFinished = {
-                                    onChangeLiquid((stateSlider).toInt())
+                                    onChangeLiquid(stateSlider.roundToInt())
                                 })
                         }
 
                         Icon(
-                            painterResource(R.drawable.ic_water_bottle),
+                            painter = painterResource(R.drawable.ic_water_bottle),
                             contentDescription = null,
                             modifier = Modifier.size(42.dp),
                             tint = Color.Unspecified
                         )
                     }
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(4),
+                        columns = GridCells.Fixed(3),
                         contentPadding = PaddingValues(
                             start = 12.dp,
                             top = 16.dp,
@@ -241,7 +245,9 @@ fun HydrationScreenBody(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            painterResource(R.drawable.ic_water_glass),
+                                            painter = if (liquidAmount >= 800) painterResource(R.drawable.ic_water_bottle) else painterResource(
+                                                R.drawable.ic_water_glass
+                                            ),
                                             contentDescription = null,
                                             modifier = Modifier.size(37.dp),
                                             tint = Color.Unspecified

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Koske Ruoho</string>
+    <string name="enable_bt_toast">Ota Bluetooth käyttöön</string>
+    <string name="device_does_not_support_bt">Tämä laite ei tue Bluetoothia.</string>
+    <string name="scan_bt_btn">SKANNAA</string>
+    <string name="no_devices_found_bt">Laitteita ei löytynyt.</string>
+    <string name="connected_bt">Yhdistetty</string>
+    <string name="unknown_bt_device">Tuntematon laite</string>
+    <string name="step_sensor_not_found">Askelanturia ei löydy.</string>
+    <string name="home">Etusivu</string>
+    <string name="step_counter">Askellaskuri</string>
+    <string name="hydration">Nesteen seuranta</string>
+    <string name="hr_monitor">Sykemittari</string>
+    <string name="set_steps_target">Aseta askel tavoite</string>
+    <string name="set_hydration_target">Aseta neste tavoite</string>
+</resources>
