@@ -102,28 +102,28 @@ fun CircularProgressBar(
                 )
             }
             if (!isHydrationScreen) {
-                Button(
-                    onClick = {
-                        StepCounterServiceHelper.launchForegroundService(
-                            context = context,
-                            action = if (isSensorOn) Constants.ACTION_STOP_SERVICE
-                            else Constants.ACTION_START_SERVICE
-                        )
-                    },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-
-                ) {
-                    Text(text = if (isSensorOn) "STOP" else "START")
-                }
-            
-//                val contentDesc = stringResource(if (!isSensorOn) R.string.enable_step_sensor else R.string.disable_step_sensor)
-//                FloatingActionButton(onClick = {
+//                Button(
+//                    onClick = {
+//                        StepCounterServiceHelper.launchForegroundService(
+//                            context = context,
+//                            action = if (isSensorOn) Constants.ACTION_STOP_SERVICE
+//                            else Constants.ACTION_START_SERVICE
+//                        )
+//                    },
+//                    modifier = Modifier.align(Alignment.BottomCenter)
 //
-//                },
-//                    modifier = Modifier.size(54.dp).align(Alignment.BottomCenter)
 //                ) {
-//                    Icon(Icons.Default.PlayArrow, contentDesc, modifier = Modifier.fillMaxSize().padding(4.dp))
+//                    Text(text = if (isSensorOn) "STOP" else "START")
 //                }
+            
+                val contentDesc = stringResource(if (!isSensorOn) R.string.enable_step_sensor else R.string.disable_step_sensor)
+                FloatingActionButton(onClick = {
+
+                },
+                    modifier = Modifier.size(54.dp).align(Alignment.BottomCenter)
+                ) {
+                    Icon(Icons.Default.PlayArrow, contentDesc, modifier = Modifier.fillMaxSize().padding(4.dp))
+                }
 
 
             }
