@@ -155,7 +155,10 @@ fun HydrationScreenBody(
                     CircularProgressBar(
                         value = (waterTaken ?: 0) / numberGoal.toFloat(),
                         target = numberGoal,
-                        foregroundColor = if ((waterTaken ?: 0) >= numberGoal) Color.Green else Color.Blue,
+                        foregroundColor = if ((waterTaken ?: 0) >= numberGoal)
+                            MaterialTheme.colors.primary
+                        else
+                            Color(0xFF48C1EC),
                         isHydrationScreen = true,
                     )
                 }
