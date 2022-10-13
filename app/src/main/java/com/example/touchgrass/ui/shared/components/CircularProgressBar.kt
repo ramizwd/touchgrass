@@ -9,8 +9,6 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -147,7 +145,6 @@ fun CircularProgressBar(
                 )
             }
             Icon(
-
                 painter = painterResource(R.drawable.ic_snail),
                 tint = Color.Unspecified,
                 contentDescription = stringResource(R.string.snail_ic_desc),
