@@ -1,13 +1,11 @@
 package com.example.touchgrass.ui.heartratemonitor
 
-import android.Manifest
 import android.app.Application
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
+import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -31,7 +29,6 @@ class HeartRateMonitorViewModel(application: Application) : AndroidViewModel(app
 
     private val _gattConnection = MutableLiveData(false)
     val gattConnection: LiveData<Boolean> = _gattConnection
-
 
     private val _heartRateData = MutableLiveData<Float>()
     val heartRateData: LiveData<Float> = _heartRateData
@@ -66,19 +63,15 @@ class HeartRateMonitorViewModel(application: Application) : AndroidViewModel(app
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .setReportDelay(0)
                 .build()
-            if (ActivityCompat.checkSelfPermission(
-                    getApplication(),
-                    Manifest.permission.BLUETOOTH_SCAN
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            try {
                 scanner?.startScan(null, settings, leScanCallback)
                 delay(SCAN_PERIOD)
                 scanner?.stopScan(leScanCallback)
                 _scanResults.postValue(results.values.toList())
                 _btScanning.postValue(false)
+            } catch (e: SecurityException) {
+                Log.d("DBG", "SecurityException")
             }
-
-
         }
         _scanResults.postValue(results.values.toList())
     }
