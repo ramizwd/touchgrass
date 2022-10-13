@@ -11,12 +11,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.toUpperCase
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.ui.Navigation
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
-import java.util.*
 
 object HomeConstants {
     const val TOTAL_MINUTES_OF_DAY = 1440f
