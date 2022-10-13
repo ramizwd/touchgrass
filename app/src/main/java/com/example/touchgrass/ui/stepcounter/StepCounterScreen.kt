@@ -10,7 +10,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,7 +29,7 @@ fun StepCounterScreen(
     var expanded by remember { mutableStateOf(false) }
     val targetStepsList = mutableListOf<Int>()
 
-    for (i in 1000..50000 step 1000) targetStepsList.add(i)
+    for (i in 8..50000 step 1000) targetStepsList.add(i)
     var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
@@ -59,7 +58,8 @@ fun StepCounterScreenBody(
     onSelectedIndex: (Int) -> Unit,
     navController: NavController,
 ) {
-//    val context = LocalContext.current
+
+    viewModel.onTargetStepsValueUpdate(stepsTarget)
 
     Scaffold(
         topBar = {
@@ -111,13 +111,6 @@ fun StepCounterScreenBody(
                         foregroundColor = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Yellow,
                         isSensorOn = isSensorOn,
                     )
-//                    Button(onClick = {
-//                        StepCounterServiceHelper.launchForegroundService(
-//                            context = context,
-//                            action = if (isSensorOn) ACTION_STOP_SERVICE
-//                            else ACTION_START_SERVICE
-//                        )
-//                    }) { Text(text = if (isSensorOn) "STOP" else "START") }
                 }
             }
             Box(
@@ -143,6 +136,7 @@ fun StepCounterScreenBody(
                 targetStepsList.forEachIndexed { index, value ->
                     DropdownMenuItem(onClick = {
                         viewModel.onTargetStepsIndexUpdate(index.toFloat())
+                        viewModel.onTargetStepsValueUpdate(value.toFloat())
                         onSelectedIndex(index)
                         onExpanded(false)
                     }) {
