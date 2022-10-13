@@ -20,6 +20,7 @@ object Constants {
     const val STEPS_TARGET_PREFERENCES = "step_target"
     const val DRANK_AMOUNT_PREFERENCES = "drank_amount"
     const val HYDRATION_TARGET_PREFERENCES = "number_goal"
+    const val STREAK_COUNTER = "streak_counter"
 
     // Icon descriptions
     const val BACK_ARROW_IC_DESC = "Back Arrow"
