@@ -2,8 +2,7 @@
     <string name="app_name">Touch Grass</string>
     <string name="enable_bt_toast">Please enable Bluetooth</string>
     <string name="device_does_not_support_bt">This device does not support Bluetooth.</string>
-    <string name="scan_bt_btn">SCAN</string>
-    <string name="scanning_bt_txt">SCANNING…</string>
+    <string name="scan_bt_btn">SCAN FOR DEVICES</string>
     <string name="no_devices_found_bt">No devices found.</string>
     <string name="connected_bt">Connected</string>
     <string name="hr_bpm_txt">%d BPM</string>
@@ -11,8 +10,13 @@
     <string name="step_sensor_not_found">Step sensor not found.</string>
     <string name="home">Home</string>
     <string name="step_counter">Steps Counter</string>
-    <string name="hydration">Hydration Tracking</string>
+    <string name="hydration">Track Hydration</string>
     <string name="hr_monitor">Heart Rate Monitor</string>
     <string name="set_steps_target">Set Steps Target</string>
     <string name="set_hydration_target">Set Hydration Target</string>
+    <string name="back_arrow_ic_desc">Back Arrow</string>
+    <string name="snail_ic_desc">snail</string>
+    <string name="enable_step_sensor">Enable step counter sensor</string>
+    <string name="disable_step_sensor">Disable step counter sensor</string>
+    <string name="streak">Streak</string>
 </resources>

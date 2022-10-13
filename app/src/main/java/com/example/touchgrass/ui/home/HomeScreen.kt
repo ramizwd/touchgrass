@@ -1,6 +1,5 @@
 package com.example.touchgrass.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
@@ -11,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.touchgrass.R
@@ -38,7 +36,6 @@ fun HomeScreen(
         currentMinutes = currentMinutes,
         streak = streak
     )
-
 }
 
 /**
@@ -67,16 +64,15 @@ fun HomeScreenBody(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressBar(
-                        percentage = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
-                        number = 0,
-                        color = if ((currentMinutes ?: 0) == 0) Color.Red else Color.Black,
+                        value = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
+                        target = 0,
                         streak = streak
                     )
                 }
