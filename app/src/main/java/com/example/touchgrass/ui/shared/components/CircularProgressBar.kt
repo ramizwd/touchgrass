@@ -64,7 +64,7 @@ fun CircularProgressBar(
             MaterialTheme.colors.onPrimary
         else
             MaterialTheme.colors.onPrimary.copy(alpha = 0.4f),
-        animationSpec = tween(1000)
+        animationSpec = tween(400)
     )
 
     Box(
@@ -153,7 +153,6 @@ fun CircularProgressBar(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .size(64.dp)
-
             )
         }
     }
