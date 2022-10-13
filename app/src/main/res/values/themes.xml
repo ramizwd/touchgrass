@@ -2,6 +2,6 @@
 <resources>
 
     <style name="Theme.Touchgrass" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:statusBarColor">@color/sc_dark_green</item>
     </style>
 </resources>
