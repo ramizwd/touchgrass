@@ -30,6 +30,7 @@ import com.example.touchgrass.ui.hydration.HydrationViewModel
 import com.example.touchgrass.ui.stepcounter.StepCounterViewModel
 import com.example.touchgrass.ui.stepcounter.StepsGraphViewModel
 import com.example.touchgrass.ui.theme.TouchgrassTheme
+import com.example.touchgrass.utils.Constants.COUNTED_STEPS
 import com.example.touchgrass.utils.Constants.DRANK_AMOUNT_PREFERENCES
 import com.example.touchgrass.utils.Constants.HYDRATION_TARGET_PREFERENCES
 import com.example.touchgrass.utils.Constants.STEPS_DAY_PREFERENCES
@@ -37,6 +38,7 @@ import com.example.touchgrass.utils.Constants.STEPS_PREFERENCES
 import com.example.touchgrass.utils.Constants.STEPS_TARGET_PREFERENCES
 import com.example.touchgrass.utils.Constants.STEPS_WEEK_PREFERENCES
 import com.example.touchgrass.utils.Constants.STREAK_COUNTER
+import com.example.touchgrass.utils.Constants.TARGET_STEPS
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -56,12 +58,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private var previousTotalSteps = 0f
-    private var previousDayOfMonth = 0f
-    private var currentDayOfMonth = 0f
+    private var previousDayOfYear = 0f
+    private var currentDayOfYear = 0f
     private var currentWeekNumber = 0f
     private var previousWeekNumber = 0f
     private var streakCounter = 0f
-    private var previousSteps = 0f
+    private var previousCountedSteps = 0f
     private var targetedSteps = 0f
     private var currentSteps = 0f
 
@@ -121,12 +123,12 @@ class MainActivity : ComponentActivity() {
             override fun run() {
                 val dateNow = LocalDateTime.now()
                 val currentDayOfWeek = dateNow.dayOfWeek.value.toFloat()
+
                 val weekFields = WeekFields.ISO
                 val currentHour = dateNow.hour
                 val currentMinute = dateNow.minute
 
-
-                currentDayOfMonth = dateNow.dayOfMonth.toFloat()
+                currentDayOfYear = dateNow.dayOfYear.toFloat()
                 currentWeekNumber = dateNow.get(weekFields.weekOfWeekBasedYear()).toFloat()
 
                 val totalMinutesOfDay = ((currentHour * 60) + currentMinute)
@@ -140,10 +142,10 @@ class MainActivity : ComponentActivity() {
                     currentSteps = totalSteps - previousTotalSteps
                     stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
                     stepsGraphViewModel.insertEntry(StepsGraph(currentDayOfWeek, currentSteps))
+                    previousCountedSteps = currentSteps
                 }
 
-
-                if (currentDayOfMonth != previousDayOfMonth ||
+                if (currentDayOfYear != previousDayOfYear ||
                     currentWeekNumber != previousWeekNumber
                 ) {
                     if (currentWeekNumber != previousWeekNumber) {
@@ -155,29 +157,36 @@ class MainActivity : ComponentActivity() {
                         previousWeekNumber = currentWeekNumber
                     }
 
-                    if (previousDayOfMonth == currentDayOfMonth - 1) {
-                        if (targetedSteps <= previousSteps) {
+                    // Logic for streak update
+                    if (previousDayOfYear == currentDayOfYear - 1) {
+
+                        if (targetedSteps <= previousCountedSteps) {
                             streakCounter++
-                            previousSteps = 0f
+                            homeViewModel.onStreaksUpdate(streakCounter)
+                            previousCountedSteps = 0f
+
                         } else {
                             streakCounter = 0f
+                            homeViewModel.onStreaksUpdate(streakCounter)
                         }
+                    }else {
+                        streakCounter = 0f
+                        homeViewModel.onStreaksUpdate(streakCounter)
                     }
 
                     previousTotalSteps = totalSteps
-                    previousDayOfMonth = currentDayOfMonth
+                    previousDayOfYear = currentDayOfYear
                     hydrationViewModel.onDrankAmountUpdate(0)
-
 
                     // For the perms popup
                     lifecycleScope.launch {
                         saveData(STEPS_PREFERENCES, previousTotalSteps)
-                        saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
+                        saveData(STEPS_DAY_PREFERENCES, currentDayOfYear)
                         saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
                         saveData(STREAK_COUNTER, streakCounter)
-                        saveData("current_step", currentSteps)
+                        saveData(COUNTED_STEPS, currentSteps)
                         stepCounterViewModel.targetStepsValue.value?.toFloat()?.let {
-                            saveData("targeted_steps", it)
+                            saveData(TARGET_STEPS, it)
                         }
                         hydrationViewModel.numberGoal.value?.toFloat()?.let {
                             saveData(HYDRATION_TARGET_PREFERENCES, it)
@@ -212,9 +221,10 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         lifecycleScope.launch {
             saveData(STEPS_PREFERENCES, previousTotalSteps)
-            saveData(STEPS_DAY_PREFERENCES, currentDayOfMonth)
+            saveData(STEPS_DAY_PREFERENCES, currentDayOfYear)
             saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
-            saveData("current_step", currentSteps)
+            saveData(COUNTED_STEPS, currentSteps)
+            saveData(STREAK_COUNTER, streakCounter)
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }
@@ -233,8 +243,8 @@ class MainActivity : ComponentActivity() {
             val savedSteps = loadData(STEPS_PREFERENCES)
             previousTotalSteps = savedSteps ?: 0f
 
-            val savedDayOfWeek = loadData(STEPS_DAY_PREFERENCES)
-            previousDayOfMonth = savedDayOfWeek ?: 0f
+            val savedDayOfYear = loadData(STEPS_DAY_PREFERENCES)
+            previousDayOfYear = savedDayOfYear ?: 0f
 
             val savedWeekNumber = loadData(STEPS_WEEK_PREFERENCES)
             previousWeekNumber = savedWeekNumber ?: 0f
@@ -242,10 +252,10 @@ class MainActivity : ComponentActivity() {
             val savedStreaks = loadData(STREAK_COUNTER)
             streakCounter = savedStreaks ?: 0f
 
-            val savedPreviousSteps = loadData("current_step")
-            previousSteps = savedPreviousSteps ?: 0f
+            val savedPreviousCountedSteps = loadData(COUNTED_STEPS)
+            previousCountedSteps = savedPreviousCountedSteps ?: 0f
 
-            val savedTargetedSteps = loadData("targeted_steps")
+            val savedTargetedSteps = loadData(TARGET_STEPS)
             targetedSteps = savedTargetedSteps ?: 0f
 
             loadData(STEPS_TARGET_PREFERENCES)?.let {
