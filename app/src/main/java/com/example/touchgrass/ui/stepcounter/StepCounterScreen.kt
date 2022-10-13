@@ -108,7 +108,10 @@ fun StepCounterScreenBody(
                     CircularProgressBar(
                         value = (steps ?: 0) / stepsTarget,
                         target = stepsTarget.toInt(),
-                        foregroundColor = if ((steps ?: 0) >= stepsTarget) Color.Green else Color.Yellow,
+                        foregroundColor = if ((steps ?: 0) >= stepsTarget)
+                            MaterialTheme.colors.primary
+                        else
+                            Color(0xFFDDFC74),
                         isSensorOn = isSensorOn,
                     )
                 }
