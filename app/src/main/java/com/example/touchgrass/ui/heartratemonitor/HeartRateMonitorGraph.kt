@@ -43,8 +43,8 @@ fun HeartRateGraph(hr: Float?, sec: Float?) {
                 val lineDataSet = LineDataSet(dataSets, label).apply {
                     color = lineColor
                     isHighlightEnabled = true
-                    lineWidth = 2f
-                    mode = LineDataSet.Mode.CUBIC_BEZIER
+//                    lineWidth = 2f
+//                    mode = LineDataSet.Mode.CUBIC_BEZIER
                     setDrawValues(false)
                     setDrawCircles(false)
                     setDrawHighlightIndicators(false)

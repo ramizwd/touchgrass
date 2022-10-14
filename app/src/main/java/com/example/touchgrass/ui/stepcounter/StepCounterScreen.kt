@@ -29,7 +29,7 @@ fun StepCounterScreen(
     var expanded by remember { mutableStateOf(false) }
     val targetStepsList = mutableListOf<Int>()
 
-    for (i in 1000..50000 step 1000) targetStepsList.add(i)
+    for (i in 10..100 step 10) targetStepsList.add(i)
     var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
