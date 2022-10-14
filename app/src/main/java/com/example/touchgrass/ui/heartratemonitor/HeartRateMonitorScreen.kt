@@ -19,7 +19,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -27,6 +29,8 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.navigation.NavController
 import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.R
+import com.example.touchgrass.service.StepCounterService
+import com.example.touchgrass.ui.shared.components.CircularProgressBar
 
 @Composable
 fun HeartRateMonitorScreen(
@@ -114,6 +118,42 @@ fun HeartRateMonitorBody(
                         )
 
                     }
+                },
+                actions = {
+                    if (btScanning) {
+                        CircularProgressIndicator(color = Color.White)
+                    } else {
+                        Text(
+                            text = "Scan Devices",
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .selectable(
+                                    selected = true,
+                                    onClick = {
+                                        if (bluetoothAdapter == null) {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    context.getString(R.string.device_does_not_support_bt),
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        }
+                                        if (bluetoothAdapter?.isEnabled == true) {
+                                            viewModel.scanDevices(bluetoothAdapter.bluetoothLeScanner)
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    context.getString(R.string.enable_bt_toast),
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        }
+                                    }
+                                )
+                        )
+                    }
                 }
             )
         }
@@ -132,67 +172,65 @@ fun HeartRateMonitorBody(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = {
-                            if (bluetoothAdapter == null) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.device_does_not_support_bt),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                            if (bluetoothAdapter?.isEnabled == true) {
-                                viewModel.scanDevices(bluetoothAdapter.bluetoothLeScanner)
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.enable_bt_toast), Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        },
+                    Column(
                         modifier = Modifier
-                    ) { Text(text = stringResource(R.string.scan_bt_btn)) }
-
-                    if (btScanning) {
-                        CircularProgressIndicator()
-                    } else {
+                            .weight(3f),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressBar(
+                            value = (bpm ?: 0) / 120.toFloat(),
+                            target = 120,
+                            foregroundColor =
+                            when (bpm ?: 0) {
+                                in 0..60 -> Color(0xFF48C1EC)
+                                in 61..100 -> Color(0xFFDDFC74)
+                                else -> Color.Red
+                            },
+                            isHeartRateScreen = true,
+                            writing = writing ?: false,
+                            isConnected = isConnected ?: false
+                        )
+                    }
+                    if (!btScanning) {
                         if (result != null && result.isEmpty()) {
                             Text(text = stringResource(R.string.no_devices_found_bt))
                         }
-                        Text(
-                            text = if (writing == true)
-                                stringResource(R.string.hr_bpm_txt, bpm ?: 0)
-                            else if (isConnected == true)
-                                stringResource(R.string.connected_bt)
-                            else "",
-                            modifier = Modifier.padding(8.dp)
-                        )
-                        LazyColumn {
+                    }
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1.4f)
+                    ) {
+                        if (!btScanning) {
                             if (result != null) {
                                 items(result,
                                     key = { listItem ->
                                         listItem.device.address
                                     }) { device ->
                                     if (device.isConnectable) {
-                                        Text(
-                                            text = if (device.device.name != null)
-                                                device.device.name
-                                            else stringResource(R.string.unknown_bt_device),
-                                            modifier = Modifier.selectable(
-                                                selected = true,
-                                                onClick = {
-                                                    gattClientCallback.connectToHRMonitor(
-                                                        device.device,
-                                                        context
-                                                    )
-                                                }
+                                        TextButton(onClick = {
+                                            gattClientCallback.connectToHRMonitor(
+                                                device.device,
+                                                context
                                             )
-                                        )
+                                        }) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.ic_bluetooth),
+                                                contentDescription = stringResource(R.string.bluetooth_ic_desc)
+                                            )
+                                            Spacer(Modifier.width(10.dp))
+                                            Text(
+                                                text = if (device.device.name != null)
+                                                    device.device.name
+                                                else stringResource(R.string.unknown_bt_device),
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+
                 }
             }
             Box(

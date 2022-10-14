@@ -35,7 +35,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = Navigation.HOME,
+        startDestination = Navigation.HEART_RATE_MONITOR,
     ) {
         composable(Navigation.HOME) {
             HomeScreen(

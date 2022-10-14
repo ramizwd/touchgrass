@@ -42,6 +42,9 @@ fun CircularProgressBar(
     animationDelay: Int = 0,
     isSensorOn: Boolean = false,
     isHydrationScreen: Boolean = false,
+    isHeartRateScreen: Boolean = false,
+    writing: Boolean = false,
+    isConnected: Boolean = false,
     streak: Float? = 0f
 ) {
     val context = LocalContext.current
@@ -87,72 +90,98 @@ fun CircularProgressBar(
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
         }
-
-        if (target != 0) {
+        if (isHeartRateScreen) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "${(curPercentage.value * target).toInt()}",
+                    text = if (writing)
+                        stringResource(R.string.hr_bpm_txt, target) else "0",
                     fontSize = fontSize,
                     fontWeight = FontWeight.Bold,
-                    color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                    color = Color.Black
                 )
                 Text(
-                    text = "/$target",
-                    color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                    text = if (isConnected)
+                        stringResource(R.string.connected_bt)
+                    else "",
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.Red
                 )
             }
-            if (!isHydrationScreen) {
-                val contentDesc = stringResource(
-                    if (!isSensorOn) R.string.enable_step_sensor
-                    else R.string.disable_step_sensor
-                )
-                FloatingActionButton(onClick = {
-                    StepCounterServiceHelper.launchForegroundService(
-                        context = context,
-                        action = if (isSensorOn) Constants.ACTION_STOP_SERVICE
-                        else Constants.ACTION_START_SERVICE
-                    )
-                },
-                    modifier = Modifier
-                        .size(54.dp)
-                        .align(Alignment.BottomCenter)
-                ) {
-                    Icon(painterResource(
-                        if (isSensorOn) R.drawable.ic_pause
-                        else R.drawable.ic_play_arrow),
-                        contentDesc,
-                        Modifier
-                            .fillMaxSize()
-                            .padding(4.dp))
-                }
-            }
-        } else {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = if (streak != null) "${streak.toInt()}" else "0",
-                    fontSize = fontSize,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = stringResource(R.string.streak),
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Icon(
-                painter = painterResource(R.drawable.ic_snail),
-                tint = Color.Unspecified,
-                contentDescription = stringResource(R.string.snail_ic_desc),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .size(64.dp)
 
-            )
+        } else {
+            if (target != 0) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "${(curPercentage.value * target).toInt()}",
+                        fontSize = fontSize,
+                        fontWeight = FontWeight.Bold,
+                        color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                    )
+                    Text(
+                        text = "/$target",
+                        color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                    )
+                }
+                if (!isHydrationScreen) {
+                    val contentDesc = stringResource(
+                        if (!isSensorOn) R.string.enable_step_sensor
+                        else R.string.disable_step_sensor
+                    )
+                    FloatingActionButton(
+                        onClick = {
+                            StepCounterServiceHelper.launchForegroundService(
+                                context = context,
+                                action = if (isSensorOn) Constants.ACTION_STOP_SERVICE
+                                else Constants.ACTION_START_SERVICE
+                            )
+                        },
+                        modifier = Modifier
+                            .size(54.dp)
+                            .align(Alignment.BottomCenter)
+                    ) {
+                        Icon(
+                            painterResource(
+                                if (isSensorOn) R.drawable.ic_pause
+                                else R.drawable.ic_play_arrow
+                            ),
+                            contentDesc,
+                            Modifier
+                                .fillMaxSize()
+                                .padding(4.dp)
+                        )
+                    }
+                }
+            } else {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (streak != null) "${streak.toInt()}" else "0",
+                        fontSize = fontSize,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.streak),
+                        fontWeight = FontWeight.Light
+                    )
+                }
+                Icon(
+                    painter = painterResource(R.drawable.ic_snail),
+                    tint = Color.Unspecified,
+                    contentDescription = stringResource(R.string.snail_ic_desc),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .size(64.dp)
+
+                )
+            }
         }
     }
 }
