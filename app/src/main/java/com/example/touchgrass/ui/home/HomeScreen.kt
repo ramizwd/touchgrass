@@ -86,13 +86,13 @@ fun HomeScreenBody(
                 Column {
                     Button(onClick = {
                         navController.navigate(Navigation.STEP_COUNTER)
-                    }) { Text(text = "STEP COUNTER") }
+                    }) { Text(text = stringResource(R.string.step_counter).uppercase()) }
                     Button(onClick = {
                         navController.navigate(Navigation.HYDRATION)
-                    }) { Text(text = "HYDRATION") }
+                    }) { Text(text = stringResource(R.string.hydration).uppercase()) }
                     Button(onClick = {
                         navController.navigate(Navigation.HEART_RATE_MONITOR)
-                    }) { Text(text = "HEART RATE MONITOR") }
+                    }) { Text(text = stringResource(R.string.hr_monitor).uppercase()) }
                 }
             }
         }
