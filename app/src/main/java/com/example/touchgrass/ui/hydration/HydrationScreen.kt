@@ -97,8 +97,10 @@ fun HydrationScreenBody(
     onExpanded: (Boolean) -> Unit,
     navController: NavController
 ) {
+
     var stateSlider by remember { mutableStateOf(200f) }
 
+    // this is to update the amount of cups that you need to drink, when you turn on the app, switch the target and cup size
     hydrationViewModel.onItemsAmountUpdate(
         if ((waterTaken ?: 0) < numberGoal)
             if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) (numberGoal - (waterTaken
@@ -125,11 +127,11 @@ fun HydrationScreenBody(
                         modifier = Modifier
                             .padding(12.dp)
                             .selectable(
-                            selected = true,
-                            onClick = {
-                                onExpanded(true)
-                            }
-                        )
+                                selected = true,
+                                onClick = {
+                                    onExpanded(true)
+                                }
+                            )
                     )
                 }
             )
@@ -150,6 +152,8 @@ fun HydrationScreenBody(
                         .fillMaxSize()
                         .wrapContentSize(Alignment.TopEnd)
                 ) {
+                    // Dropdown Menu for the purpose of listing the targeted goals and to update to view-model for it to save the targeted value
+                    // made a for loop so no need to hard code it
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { onExpanded(false) }
@@ -166,7 +170,6 @@ fun HydrationScreenBody(
                         }
                     }
                 }
-
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -182,7 +185,6 @@ fun HydrationScreenBody(
                     )
                 }
             }
-
             Box(
                 contentAlignment = Alignment.TopStart,
                 modifier = Modifier
@@ -201,11 +203,13 @@ fun HydrationScreenBody(
                             modifier = Modifier.size(37.dp),
                             tint = Color.Unspecified
                         )
+                        // Slider and SliderLabel is inside the box them to align
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.weight(1f)
                         ) {
                             SliderLabel(values = list)
+                            // slider for the purpose of adjusting the cup size
                             Slider(
                                 value = stateSlider,
                                 onValueChange = { stateSlider = it },
@@ -215,7 +219,6 @@ fun HydrationScreenBody(
                                     onChangeLiquid(stateSlider.roundToInt())
                                 })
                         }
-
                         Icon(
                             painter = painterResource(R.drawable.ic_water_bottle),
                             contentDescription = null,
@@ -233,8 +236,10 @@ fun HydrationScreenBody(
                         ),
                     ) {
                         if (itemAmount != null) {
+                            // check the item amount and make the cups depended on that
                             items(itemAmount) {
                                 OutlinedButton(
+                                    // when the button has been pressed it will reduce a item amount and increase the amount of water you have drank
                                     onClick = {
                                         hydrationViewModel.onDrankAmountPlus(liquidAmount)
                                         hydrationViewModel.onItemsAmountReduce()
@@ -268,6 +273,9 @@ fun HydrationScreenBody(
     }
 }
 
+/**
+ * set up for the purpose of setting the labels of the slider
+ */
 
 @Composable
 fun SliderLabel(values: List<String>) {
