@@ -186,14 +186,6 @@ fun CircularProgressBar(
 
                 )
             }
-            Icon(
-                painter = painterResource(R.drawable.ic_snail),
-                tint = Color.Unspecified,
-                contentDescription = stringResource(R.string.snail_ic_desc),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .size(64.dp)
-            )
         }
     }
 }
