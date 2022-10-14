@@ -127,6 +127,7 @@ class MainActivity : ComponentActivity() {
                 val currentHour = dateNow.hour
                 val currentMinute = dateNow.minute
 
+                homeViewModel.onStreaksUpdate(streakCounter)
                 currentDayOfYear = dateNow.dayOfYear.toFloat()
                 currentWeekNumber = dateNow.get(weekFields.weekOfWeekBasedYear()).toFloat()
 
@@ -226,6 +227,9 @@ class MainActivity : ComponentActivity() {
             saveData(STEPS_WEEK_PREFERENCES, currentWeekNumber)
             saveData(COUNTED_STEPS, currentSteps)
             saveData(STREAK_COUNTER, streakCounter)
+            stepCounterViewModel.targetStepsValue.value?.toFloat()?.let {
+                saveData(TARGET_STEPS, it)
+            }
             stepCounterViewModel.targetStepsIndex.value?.let {
                 saveData(STEPS_TARGET_PREFERENCES, it)
             }

@@ -1,16 +1,20 @@
 package com.example.touchgrass.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.ui.Navigation
@@ -83,16 +87,59 @@ fun HomeScreenBody(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                Column {
-                    Button(onClick = {
-                        navController.navigate(Navigation.STEP_COUNTER)
-                    }) { Text(text = stringResource(R.string.step_counter).uppercase()) }
-                    Button(onClick = {
-                        navController.navigate(Navigation.HYDRATION)
-                    }) { Text(text = stringResource(R.string.hydration).uppercase()) }
-                    Button(onClick = {
-                        navController.navigate(Navigation.HEART_RATE_MONITOR)
-                    }) { Text(text = stringResource(R.string.hr_monitor).uppercase()) }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(start = 14.dp)
+                            .clickable {
+                                navController.navigate(Navigation.STEP_COUNTER)
+                            }
+                            .size(114.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colors.primary)
+
+                    ) {
+                        Text(
+                            text = stringResource(R.string.step_counter),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(Navigation.HYDRATION)
+                            }
+                            .size(114.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colors.primary)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.hydration),
+                            modifier = Modifier.padding(8.dp))
+
+                    }
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(end = 14.dp)
+                            .clickable {
+                                navController.navigate(Navigation.HEART_RATE_MONITOR)
+                            }
+                            .size(114.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colors.primary)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.hr_monitor),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                 }
             }
         }
