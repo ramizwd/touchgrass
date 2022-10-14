@@ -17,8 +17,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.example.touchgrass.service.StepCounterService.Companion.isSensorOn
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Description
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -66,22 +64,25 @@ fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
 
             val barDataSet = BarDataSet(dataSet, label).apply {
                 valueFormatter = barDataSetFormatter
-                valueTextSize = 10f
+                valueTextSize = 12f
                 color = animatedTextColor.toArgb()
-                setDrawValues(true)
             }
 
-            val desc = Description()
             val barData = BarData(barDataSet)
-            desc.text = ""
             barChart.apply {
                 xAxis.apply {
                     valueFormatter = IndexAxisValueFormatter(xAxisLabels)
-                    axisLeft.granularity = 5f
-                    axisLeft.axisMinimum = 0f
-                    axisRight.isEnabled = false
+                    setDrawGridLines(false)
                 }
-                description = desc
+                axisLeft.apply {
+                    granularity = 5f
+                    axisMinimum = 0f
+                }
+                axisRight.apply {
+                    setDrawLabels(false)
+                    setDrawGridLines(false)
+                }
+                description.isEnabled = false
                 data = barData
                 invalidate()
             }
