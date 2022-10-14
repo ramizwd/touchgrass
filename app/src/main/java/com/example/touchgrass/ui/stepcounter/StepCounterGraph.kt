@@ -40,6 +40,7 @@ fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
     }
     val label = "Daily Steps"
     val xAxisLabels = listOf("", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+    val themeTextColor = MaterialTheme.colors.onPrimary.toArgb()
 
     val animatedTextColor by animateColorAsState(
         targetValue = if (isSensorOn)
@@ -65,6 +66,7 @@ fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
                 valueFormatter = barDataSetFormatter
                 valueTextSize = 12f
                 color = animatedTextColor.toArgb()
+                valueTextColor = themeTextColor
             }
 
             val barData = BarData(barDataSet)
@@ -73,15 +75,18 @@ fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
                     valueFormatter = IndexAxisValueFormatter(xAxisLabels)
                     setDrawGridLines(false)
                     setExtraOffsets(0f,0f,0f,10f)
+                    textColor = themeTextColor
                 }
                 axisLeft.apply {
                     granularity = 5f
                     axisMinimum = 0f
+                    textColor = themeTextColor
                 }
                 axisRight.apply {
                     setDrawLabels(false)
                     setDrawGridLines(false)
                 }
+                legend.textColor = themeTextColor
                 description = null
                 data = barData
                 invalidate()
