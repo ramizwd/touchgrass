@@ -64,10 +64,10 @@ fun CircularProgressBar(
 
     val animatedTextColor by animateColorAsState(
         targetValue = if (isSensorOn)
-            Color.Black
+            MaterialTheme.colors.onPrimary
         else
-            Color.Gray,
-        animationSpec = tween(1000)
+            MaterialTheme.colors.onPrimary.copy(alpha = 0.4f),
+        animationSpec = tween(400)
     )
 
     Box(
@@ -99,12 +99,11 @@ fun CircularProgressBar(
                     text = if (writing)
                         stringResource(
                             R.string.hr_bpm_txt,
-                            (curPercentage.value * target).toInt()
-                        ) else "0",
+                            (curPercentage.value * target).toInt()) 
+                            else "0",
                     fontSize = fontSize,
                     fontWeight = FontWeight.Bold,
                 )
-
             }
             Text(
                 text = if (isConnected)
@@ -124,11 +123,13 @@ fun CircularProgressBar(
                         text = "${(curPercentage.value * target).toInt()}",
                         fontSize = fontSize,
                         fontWeight = FontWeight.Bold,
-                        color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                        color = if (!isHydrationScreen) animatedTextColor
+                        else MaterialTheme.colors.onPrimary
                     )
-                    Text(
-                        text = "/$target",
-                        color = if (!isHydrationScreen) animatedTextColor else Color.Black
+                Text(
+                    text = "/$target",
+                    color = if (!isHydrationScreen) animatedTextColor
+                    else MaterialTheme.colors.onPrimary
                     )
                 }
                 if (!isHydrationScreen) {
@@ -185,6 +186,14 @@ fun CircularProgressBar(
 
                 )
             }
+            Icon(
+                painter = painterResource(R.drawable.ic_snail),
+                tint = Color.Unspecified,
+                contentDescription = stringResource(R.string.snail_ic_desc),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .size(64.dp)
+            )
         }
     }
 }
