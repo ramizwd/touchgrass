@@ -103,17 +103,17 @@ fun CircularProgressBar(
                         ) else "0",
                     fontSize = fontSize,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
                 )
-                Text(
-                    text = if (isConnected)
-                        stringResource(R.string.connected_bt)
-                    else "",
-                    modifier = Modifier.padding(8.dp),
-                    color = Color.Red
-                )
-            }
 
+            }
+            Text(
+                text = if (isConnected)
+                    stringResource(R.string.connected_bt)
+                else "",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.BottomCenter),
+            )
         } else {
             if (target != 0) {
                 Column(

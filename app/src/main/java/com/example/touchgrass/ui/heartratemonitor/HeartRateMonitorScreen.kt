@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanResult
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,7 +30,6 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.navigation.NavController
 import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.R
-import com.example.touchgrass.service.StepCounterService
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
 
 @Composable
@@ -141,6 +141,7 @@ fun HeartRateMonitorBody(
                                         }
                                         if (bluetoothAdapter?.isEnabled == true) {
                                             viewModel.scanDevices(bluetoothAdapter.bluetoothLeScanner)
+                                            viewModel.onWritingUpdate(false)
                                         } else {
                                             Toast
                                                 .makeText(
@@ -184,25 +185,25 @@ fun HeartRateMonitorBody(
                             when (bpm ?: 0) {
                                 in 0..60 -> Color(0xFF48C1EC)
                                 in 61..100 -> Color(0xFFDDFC74)
-                                else -> Color.Red
+                                else -> Color(0xFFF0A202)
                             },
                             isHeartRateScreen = true,
                             writing = writing ?: false,
                             isConnected = isConnected ?: false
                         )
                     }
-                    if (!btScanning) {
-                        if (result != null && result.isEmpty()) {
-                            Text(text = stringResource(R.string.no_devices_found_bt))
-                        }
-                    }
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1.4f)
-                    ) {
+                    if ((result != null) && (writing == false)) {
                         if (!btScanning) {
-                            if (result != null) {
+                            if (result.isEmpty()) {
+                                Text(text = stringResource(R.string.no_devices_found_bt))
+                            }
+                        }
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1.4f)
+                        ) {
+                            if (!btScanning) {
                                 items(result,
                                     key = { listItem ->
                                         listItem.device.address
