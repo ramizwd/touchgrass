@@ -97,7 +97,10 @@ fun CircularProgressBar(
             ) {
                 Text(
                     text = if (writing)
-                        stringResource(R.string.hr_bpm_txt, target) else "0",
+                        stringResource(
+                            R.string.hr_bpm_txt,
+                            (curPercentage.value * target).toInt()
+                        ) else "0",
                     fontSize = fontSize,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
