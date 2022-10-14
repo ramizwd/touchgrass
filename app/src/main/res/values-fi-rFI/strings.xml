@@ -19,4 +19,6 @@
     <string name="disable_step_sensor">Poista askellaskurin anturi käytöstä</string>
     <string name="scan_bt_btn">SKANNAA LAITTEITA</string>
     <string name="streak">Putki</string>
+    <string name="no_hr_data">Syketietoja ei ole saatavilla kaavion piirtämistä varten.</string>
+    <string name="scan">Skannauslaitteet</string>
 </resources>

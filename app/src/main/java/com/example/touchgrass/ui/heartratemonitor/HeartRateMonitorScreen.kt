@@ -124,7 +124,7 @@ fun HeartRateMonitorBody(
                         CircularProgressIndicator(color = Color.White)
                     } else {
                         Text(
-                            text = "Scan Devices",
+                            text =  stringResource(R.string.scan),
                             modifier = Modifier
                                 .padding(12.dp)
                                 .selectable(

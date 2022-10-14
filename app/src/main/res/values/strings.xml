@@ -19,6 +19,7 @@
     <string name="enable_step_sensor">Enable step counter sensor</string>
     <string name="disable_step_sensor">Disable step counter sensor</string>
     <string name="streak">Streak</string>
+    <string name="scan">Scan Devices</string>
     <string name="no_hr_data">No heart rate data available to draw a graph.</string>
     <string name="bluetooth_ic_desc" translatable="false">Bluetooth</string>
 </resources>
