@@ -21,6 +21,9 @@ import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.touchgrass.utils.Constants.NOTIFICATION_ID
 import com.example.touchgrass.utils.Constants.SENSOR_STEPS_TAG
 
+/**
+ * Foreground service class with SensorEventListener for the steps counter sensor.
+ */
 class StepCounterService: Service(), SensorEventListener {
     companion object {
         private lateinit var sensorManager: SensorManager
@@ -34,6 +37,9 @@ class StepCounterService: Service(), SensorEventListener {
         return null
     }
 
+    /**
+     * Check what the intent action is and launch a function depending on it.
+     */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent?.action) {
             ACTION_START_SERVICE -> start()
@@ -42,9 +48,13 @@ class StepCounterService: Service(), SensorEventListener {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    /**
+     * Creates the notification, starts the foreground service,
+     * and launches [registerStepCounterSensor] function.
+     */
     private fun start() {
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Counting your steps...")
+            .setContentTitle(getString(R.string.service_notif_message))
             .setSmallIcon(R.drawable.ic_walking)
             .setSilent(true)
             .setOngoing(true)
@@ -53,12 +63,20 @@ class StepCounterService: Service(), SensorEventListener {
         startForeground(NOTIFICATION_ID, notification.build())
     }
 
+    /**
+     * Remove the service from the foreground state, stops the service,
+     * launches [unregisterStepCounterSensor] function.
+     */
     private fun stop() {
         unregisterStepCounterSensor()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
+    /**
+     * Register the steps counter sensor manager if the sensor is available,
+     * else make a toast and launch the [stop] function.
+     */
     private fun registerStepCounterSensor() {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
@@ -80,6 +98,9 @@ class StepCounterService: Service(), SensorEventListener {
         }
     }
 
+    /**
+     * Unregister the steps counter sensor manager if the sensor is on.
+     */
     private fun unregisterStepCounterSensor() {
         if (isSensorOn) {
             sensorManager.unregisterListener(this)
@@ -87,6 +108,10 @@ class StepCounterService: Service(), SensorEventListener {
         }
     }
 
+    /**
+     * Updates the [totalSteps] variable with the steps value
+     * every time the sensor detects a change.
+     */
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
         event.values.firstOrNull()?.let {

@@ -17,6 +17,13 @@ import com.example.touchgrass.R
 import com.example.touchgrass.service.StepCounterService.Companion.isSensorOn
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
 
+/**
+ * Stateful composable which manages state.
+ *
+ * @param viewModel StepCounter ViewModel providing LiveData for the StepCounter screen composable.
+ * @param stepsGraphViewModel ViewModel for the [StepCounterGraph] composable.
+ * @param navController provides navigation component.
+ */
 @Composable
 fun StepCounterScreen(
     viewModel: StepCounterViewModel,
@@ -28,8 +35,8 @@ fun StepCounterScreen(
 
     var expanded by remember { mutableStateOf(false) }
     val targetStepsList = mutableListOf<Int>()
+    (1000..50000 step 1000).forEach { targetStepsList.add(it) }
 
-    for (i in 10..100 step 10) targetStepsList.add(i)
     var selectedIndex by remember { mutableStateOf(targetSteps?.toInt() ?: 0) }
     val stepsTarget = targetStepsList[selectedIndex].toFloat()
 
@@ -46,6 +53,16 @@ fun StepCounterScreen(
     )
 }
 
+/**
+ * Stateless composable for displaying the StepCounterScreen.
+ *
+ * @param steps (state) total counted steps.
+ * @param stepsTarget (state) set target steps.
+ * @param targetStepsList list with all the target steps that can be chosen.
+ * @param expanded boolean that expands or collapses the set target dropdown menu.
+ * @param onExpanded closes the set target dropdown menu when an item is chosen from it.
+ * @param onSelectedIndex provides the value of clicked index from the [targetStepsList].
+ */
 @Composable
 fun StepCounterScreenBody(
     viewModel: StepCounterViewModel,

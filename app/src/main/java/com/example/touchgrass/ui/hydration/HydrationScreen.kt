@@ -25,20 +25,18 @@ import com.example.touchgrass.R
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
 import kotlin.math.roundToInt
 
-
-/**
- * Stateful Composable which manages state
- */
-
-object DefaultValue {
-    const val ML = 250
-    const val THOUSAND = 1000
+object HydrationConstants {
+    const val STEP_ML_VALUE = 250
+    const val BASE_ML_VALUE = 1000
     const val CUP_SIZE = 200
-    const val THREE_THOUSAND = 3000
+    const val DEFAULT_TARGET = 3000
 }
 
 /**
- * Composable for displaying the Hydration Screen
+ * Stateful Composable which manages state.
+ *
+ * @param hydrationViewModel ViewModel for HydrationScreen providing LiveData for it.
+ * @param navController provides navigation component.
  */
 @Composable
 fun HydrationScreen(
@@ -50,10 +48,13 @@ fun HydrationScreen(
     val itemAmount by hydrationViewModel.itemsAmount.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
-    var numberGoal by remember { mutableStateOf(hydrationTarget ?: DefaultValue.THREE_THOUSAND) }
-    var liquidAmount by remember { mutableStateOf(DefaultValue.CUP_SIZE) }
+    var numberGoal by remember {
+        mutableStateOf(hydrationTarget ?:
+        HydrationConstants.DEFAULT_TARGET)
+    }
+    var liquidAmount by remember { mutableStateOf(HydrationConstants.CUP_SIZE) }
 
-    val list: List<String> = listOf(
+    val cupSizesList: List<String> = listOf(
         "100",
         "200",
         "300",
@@ -65,11 +66,12 @@ fun HydrationScreen(
         "900",
         "1000"
     )
+
     HydrationScreenBody(
         hydrationViewModel,
         waterTaken,
         itemAmount,
-        list,
+        cupSizesList = cupSizesList,
         numberGoal = numberGoal,
         onNumberGoalChange = { numberGoal = it },
         liquidAmount = liquidAmount,
@@ -81,14 +83,22 @@ fun HydrationScreen(
 }
 
 /**
- * Composable for displaying the Home Screen
+ * Composable for displaying the Hydration Screen
+ *
+ * @param waterTaken (state) amount of water consumed.
+ * @param itemAmount (state) amount of cups/bottles displayed.
+ * @param numberGoal (state) set target milliliters.
+ * @param cupSizesList provides values (milliliters) for the cup slider.
+ * @param onNumberGoalChange provides the value of clicked index from the [cupSizesList].
+ * @param expanded boolean that expands or collapses the set target dropdown menu.
+ * @param onExpanded closes the set target dropdown menu when an item is chosen from it.
  */
 @Composable
 fun HydrationScreenBody(
     hydrationViewModel: HydrationViewModel,
     waterTaken: Int?,
     itemAmount: Int?,
-    list: List<String>,
+    cupSizesList: List<String>,
     numberGoal: Int,
     onNumberGoalChange: (Int) -> Unit,
     liquidAmount: Int,
@@ -100,7 +110,7 @@ fun HydrationScreenBody(
 
     var stateSlider by remember { mutableStateOf(200f) }
 
-    // this is to update the amount of cups that you need to drink, when you turn on the app, switch the target and cup size
+    // Updates the amount of cups depending on the drank amount and target amount.
     hydrationViewModel.onItemsAmountUpdate(
         if ((waterTaken ?: 0) < numberGoal)
             if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) (numberGoal - (waterTaken
@@ -152,14 +162,15 @@ fun HydrationScreenBody(
                         .fillMaxSize()
                         .wrapContentSize(Alignment.TopEnd)
                 ) {
-                    // Dropdown Menu for the purpose of listing the targeted goals and to update to view-model for it to save the targeted value
-                    // made a for loop so no need to hard code it
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { onExpanded(false) }
                     ) {
+                        // Creates the set target dropdown menu items
+                        // and saves the selected target value.
                         for (i in 0.rangeTo(16)) {
-                            val values = DefaultValue.THOUSAND + (DefaultValue.ML * i)
+                            val values = HydrationConstants.BASE_ML_VALUE +
+                                    (HydrationConstants.STEP_ML_VALUE * i)
                             DropdownMenuItem(onClick = {
                                 hydrationViewModel.onNumberGoalUpdate(values)
                                 onNumberGoalChange(values)
@@ -203,13 +214,11 @@ fun HydrationScreenBody(
                             modifier = Modifier.size(37.dp),
                             tint = Color.Unspecified
                         )
-                        // Slider and SliderLabel is inside the box them to align
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.weight(1f)
                         ) {
-                            SliderLabel(values = list)
-                            // slider for the purpose of adjusting the cup size
+                            SliderLabel(values = cupSizesList)
                             Slider(
                                 value = stateSlider,
                                 onValueChange = { stateSlider = it },
@@ -235,11 +244,10 @@ fun HydrationScreenBody(
                             bottom = 16.dp
                         ),
                     ) {
+                        // Check the item amount and create the cups depending on it.
                         if (itemAmount != null) {
-                            // check the item amount and make the cups depended on that
                             items(itemAmount) {
                                 OutlinedButton(
-                                    // when the button has been pressed it will reduce a item amount and increase the amount of water you have drank
                                     onClick = {
                                         hydrationViewModel.onDrankAmountPlus(liquidAmount)
                                         hydrationViewModel.onItemsAmountReduce()
@@ -254,9 +262,9 @@ fun HydrationScreenBody(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            painter = if (liquidAmount >= 800) painterResource(R.drawable.ic_water_bottle) else painterResource(
-                                                R.drawable.ic_water_glass
-                                            ),
+                                            painter = if (liquidAmount >= 800)
+                                                painterResource(R.drawable.ic_water_bottle)
+                                            else painterResource(R.drawable.ic_water_glass),
                                             contentDescription = null,
                                             modifier = Modifier.size(37.dp),
                                             tint = Color.Unspecified
@@ -274,9 +282,8 @@ fun HydrationScreenBody(
 }
 
 /**
- * set up for the purpose of setting the labels of the slider
+ * Provided a list of cups size and sets them as the slider labels.
  */
-
 @Composable
 fun SliderLabel(values: List<String>) {
     val textSize = with(LocalDensity.current) { 11.dp.toPx() }

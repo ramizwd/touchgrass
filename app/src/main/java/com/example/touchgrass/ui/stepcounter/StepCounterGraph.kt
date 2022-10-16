@@ -22,6 +22,9 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 
+/**
+ * Steps counter graph composable.
+ */
 @Composable
 fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
     val dataSet = remember { mutableStateListOf(
@@ -34,10 +37,12 @@ fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
         BarEntry(7f ,0f)
     )}
 
+    // Replaces a BarEntry from the dataSet depending on the day and updates the Y (steps) value.
     val graphEntries = stepsGraphViewModel.getAllGraphEntries().observeAsState(listOf())
     graphEntries.value.forEach {
         dataSet[it.dayOfWeek.toInt() - 1] = BarEntry(it.dayOfWeek, it.steps)
     }
+
     val label = "Daily Steps"
     val xAxisLabels = listOf("", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
     val themeTextColor = MaterialTheme.colors.onPrimary.toArgb()
@@ -56,7 +61,7 @@ fun StepCounterGraph(stepsGraphViewModel: StepsGraphViewModel) {
             BarChart(context)
         },
         update = { barChart ->
-
+            // Formats the Y values (steps) from Float to Int then to String.
             val barDataSetFormatter = object : ValueFormatter() {
                 override fun getBarLabel(barEntry: BarEntry?): String =
                      barEntry?.y?.toInt().toString()

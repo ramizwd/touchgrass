@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 
 /**
  * HydrationViewModel purpose is to save, update and change livedata
+ * ViewModel class with [numberGoal] LiveData that provides the target water amount,
+ * [drankAmount] LiveData that provides the total consumed water, and
+ * [itemsAmount] LiveData that provides the amount of cups.
  */
 class HydrationViewModel {
     private val _numberGoal: MutableLiveData<Int> = MutableLiveData()
@@ -17,7 +20,7 @@ class HydrationViewModel {
     val itemsAmount: LiveData<Int> = _itemsAmount
 
     /**
-     * update the targeted goal to drink
+     * Updates the target milliliters.
      */
     fun onNumberGoalUpdate(numberGoal: Int) {
         _numberGoal.value = numberGoal
@@ -36,7 +39,6 @@ class HydrationViewModel {
     fun onDrankAmountUpdate(drankAmount: Int) {
         _drankAmount.value = drankAmount
     }
-
     /**
      * update the item amount made
      */
