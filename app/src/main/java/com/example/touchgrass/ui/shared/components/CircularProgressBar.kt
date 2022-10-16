@@ -27,12 +27,13 @@ import com.example.touchgrass.R
 import com.example.touchgrass.service.StepCounterServiceHelper
 import com.example.touchgrass.utils.Constants
 
-// TODO - redo the if statement logic and calculate percentage here
-
+/**
+ *
+ */
 @Composable
 fun CircularProgressBar(
-    value: Float,
-    target: Int,
+    value: Float = 0f,
+    target: Int = 0,
     fontSize: TextUnit = 42.sp,
     radius: Dp = 125.dp,
     foregroundColor: Color = MaterialTheme.colors.secondary,
@@ -41,11 +42,13 @@ fun CircularProgressBar(
     animationDuration: Int = 1000,
     animationDelay: Int = 0,
     isSensorOn: Boolean = false,
-    isHydrationScreen: Boolean = false,
-    isHeartRateScreen: Boolean = false,
+    streak: Float? = 0f,
     writing: Boolean = false,
     isConnected: Boolean = false,
-    streak: Float? = 0f
+    isHydrationScreen: Boolean = false,
+    isHeartRateScreen: Boolean = false,
+    isStepCounterScreen: Boolean = false,
+    isHomeScreen: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -90,6 +93,23 @@ fun CircularProgressBar(
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
         }
+        if(isHydrationScreen) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "${(curPercentage.value * target).toInt()}",
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onPrimary
+                )
+                Text(
+                    text = "/$target",
+                    color = MaterialTheme.colors.onPrimary
+                )
+            }
+        }
         if (isHeartRateScreen) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -99,8 +119,9 @@ fun CircularProgressBar(
                     text = if (writing)
                         stringResource(
                             R.string.hr_bpm_txt,
-                            (curPercentage.value * target).toInt()) 
-                            else "0",
+                            (curPercentage.value * target).toInt()
+                        )
+                    else "0",
                     fontSize = fontSize,
                     fontWeight = FontWeight.Bold,
                 )
@@ -113,79 +134,74 @@ fun CircularProgressBar(
                     .padding(8.dp)
                     .align(Alignment.BottomCenter),
             )
-        } else {
-            if (target != 0) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "${(curPercentage.value * target).toInt()}",
-                        fontSize = fontSize,
-                        fontWeight = FontWeight.Bold,
-                        color = if (!isHydrationScreen) animatedTextColor
-                        else MaterialTheme.colors.onPrimary
-                    )
+        }
+        if (isStepCounterScreen) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "${(curPercentage.value * target).toInt()}",
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = animatedTextColor
+                )
                 Text(
                     text = "/$target",
-                    color = if (!isHydrationScreen) animatedTextColor
-                    else MaterialTheme.colors.onPrimary
-                    )
-                }
-                if (!isHydrationScreen) {
-                    val contentDesc = stringResource(
-                        if (!isSensorOn) R.string.enable_step_sensor
-                        else R.string.disable_step_sensor
-                    )
-                    FloatingActionButton(
-                        onClick = {
-                            StepCounterServiceHelper.launchForegroundService(
-                                context = context,
-                                action = if (isSensorOn) Constants.ACTION_STOP_SERVICE
-                                else Constants.ACTION_START_SERVICE
-                            )
-                        },
-                        modifier = Modifier
-                            .size(54.dp)
-                            .align(Alignment.BottomCenter)
-                    ) {
-                        Icon(
-                            painterResource(
-                                if (isSensorOn) R.drawable.ic_pause
-                                else R.drawable.ic_play_arrow
-                            ),
-                            contentDesc,
-                            Modifier
-                                .fillMaxSize()
-                                .padding(4.dp)
-                        )
-                    }
-                }
-            } else {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if (streak != null) "${streak.toInt()}" else "0",
-                        fontSize = fontSize,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.streak),
-                        fontWeight = FontWeight.Light
-                    )
-                }
-                Icon(
-                    painter = painterResource(R.drawable.ic_snail),
-                    tint = Color.Unspecified,
-                    contentDescription = stringResource(R.string.snail_ic_desc),
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .size(64.dp)
-
+                    color = animatedTextColor
                 )
             }
+            val contentDesc = stringResource(
+                if (!isSensorOn) R.string.enable_step_sensor
+                else R.string.disable_step_sensor
+            )
+            FloatingActionButton(
+                onClick = {
+                    StepCounterServiceHelper.launchForegroundService(
+                        context = context,
+                        action = if (isSensorOn) Constants.ACTION_STOP_SERVICE
+                        else Constants.ACTION_START_SERVICE
+                    )
+                },
+                modifier = Modifier
+                    .size(54.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                Icon(
+                    painterResource(
+                        if (isSensorOn) R.drawable.ic_pause
+                        else R.drawable.ic_play_arrow
+                    ),
+                    contentDesc,
+                    Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
+                )
+            }
+        }
+        if (isHomeScreen) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = if (streak != null) "${streak.toInt()}" else "0",
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.streak),
+                    fontWeight = FontWeight.Light
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_snail),
+                tint = Color.Unspecified,
+                contentDescription = stringResource(R.string.snail_ic_desc),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .size(64.dp)
+            )
         }
     }
 }

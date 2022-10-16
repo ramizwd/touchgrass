@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
+import com.example.touchgrass.ui.theme.SCBlue
 import kotlin.math.roundToInt
 
 object HydrationConstants {
@@ -49,8 +50,9 @@ fun HydrationScreen(
 
     var expanded by remember { mutableStateOf(false) }
     var numberGoal by remember {
-        mutableStateOf(hydrationTarget ?:
-        HydrationConstants.DEFAULT_TARGET)
+        mutableStateOf(
+            hydrationTarget ?: HydrationConstants.DEFAULT_TARGET
+        )
     }
     var liquidAmount by remember { mutableStateOf(HydrationConstants.CUP_SIZE) }
 
@@ -188,11 +190,10 @@ fun HydrationScreenBody(
                     CircularProgressBar(
                         value = (waterTaken ?: 0) / numberGoal.toFloat(),
                         target = numberGoal,
+                        isHydrationScreen = true,
                         foregroundColor = if ((waterTaken ?: 0) >= numberGoal)
                             MaterialTheme.colors.primary
-                        else
-                            Color(0xFF48C1EC),
-                        isHydrationScreen = true,
+                        else SCBlue,
                     )
                 }
             }
