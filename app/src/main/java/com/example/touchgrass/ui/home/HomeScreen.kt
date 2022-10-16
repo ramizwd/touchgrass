@@ -80,7 +80,7 @@ fun HomeScreenBody(
                 ) {
                     CircularProgressBar(
                         value = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
-                        target = 0,
+                        isHomeScreen = true,
                         streak = streak
                     )
                 }

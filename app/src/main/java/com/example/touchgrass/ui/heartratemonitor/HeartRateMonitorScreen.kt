@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -27,9 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.navigation.NavController
-import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.R
+import com.example.touchgrass.gattclient.GattClientCallback
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
+import com.example.touchgrass.ui.theme.SCBlue
+import com.example.touchgrass.ui.theme.SCOrange
+import com.example.touchgrass.ui.theme.SCWhite
+import com.example.touchgrass.ui.theme.SCYellow
 
 @Composable
 fun HeartRateMonitorScreen(
@@ -120,10 +123,10 @@ fun HeartRateMonitorBody(
                 },
                 actions = {
                     if (btScanning) {
-                        CircularProgressIndicator(color = Color.White)
+                        CircularProgressIndicator(color = SCWhite)
                     } else {
                         Text(
-                            text =  stringResource(R.string.scan),
+                            text = stringResource(R.string.scan),
                             modifier = Modifier
                                 .padding(12.dp)
                                 .selectable(
@@ -180,17 +183,26 @@ fun HeartRateMonitorBody(
                         CircularProgressBar(
                             value = (bpm ?: 0) / 120.toFloat(),
                             target = 120,
+                            isHeartRateScreen = true,
                             foregroundColor =
                             when (bpm ?: 0) {
-                                in 0..60 -> Color(0xFF48C1EC)
-                                in 61..100 -> Color(0xFFDDFC74)
-                                else -> Color(0xFFF0A202)
+                                in 0..60 -> SCBlue
+                                in 61..100 -> SCYellow
+                                else -> SCOrange
                             },
-                            isHeartRateScreen = true,
                             writing = writing ?: false,
                             isConnected = isConnected ?: false
                         )
                     }
+                }
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Column {
                     if ((result != null) && (writing == false)) {
                         if (!btScanning) {
                             if (result.isEmpty()) {
@@ -229,18 +241,9 @@ fun HeartRateMonitorBody(
                                 }
                             }
                         }
+                    } else {
+                        HeartRateGraph(heartRate, seconds)
                     }
-
-                }
-            }
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                Column {
-                    HeartRateGraph(heartRate, seconds)
                 }
             }
         }
