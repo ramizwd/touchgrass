@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
+        // Activity permission request.
         if ((ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACTIVITY_RECOGNITION
@@ -114,7 +115,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Handler for getting the time and changing variables based on the it.
+     * Handler for getting the time and changing variables based on it on each second passed.
      */
     private fun timerHandler() {
         val timeHandler = Handler(mainLooper)
@@ -131,13 +132,19 @@ class MainActivity : ComponentActivity() {
                 currentDayOfYear = dateNow.dayOfYear.toFloat()
                 currentWeekNumber = dateNow.get(weekFields.weekOfWeekBasedYear()).toFloat()
 
+                // calculates the current total minutes of the day and updates the LiveData in
+                // Home ViewModel.
                 val totalMinutesOfDay = ((currentHour * 60) + currentMinute)
-                homeViewModel.onHourUpdate(totalMinutesOfDay)
+                homeViewModel.onTotalMinutesUpdate(totalMinutesOfDay)
 
+                // If the previousTotalSteps is 0 then make previousTotalSteps same value
+                // as totalSteps so it will zero the currentSteps value.
                 if (previousTotalSteps == 0f) {
                     previousTotalSteps = totalSteps
                 }
 
+                // Calculates the current steps and updates the LiveData in the ViewModel,
+                // also updates the steps counter graph accordingly and sets the streak count.
                 if (totalSteps != 0f) {
                     currentSteps = totalSteps - previousTotalSteps
                     stepCounterViewModel.onStepsUpdate(currentSteps.toInt())
@@ -147,9 +154,12 @@ class MainActivity : ComponentActivity() {
                     stepCounterViewModel.onStepsUpdate(previousCountedSteps.toInt())
                 }
 
+                // Resets the values if the day is not equal to the previously saved day or week.
                 if (currentDayOfYear != previousDayOfYear ||
                     currentWeekNumber != previousWeekNumber) {
 
+                    // Deletes all data store in the steps counter database
+                    // and inserts default values.
                     if (currentWeekNumber != previousWeekNumber) {
                         stepsGraphViewModel.deleteEntries()
                         for (dayOfWeek in 1..7) {
@@ -159,7 +169,9 @@ class MainActivity : ComponentActivity() {
                         previousWeekNumber = currentWeekNumber
                     }
 
-                    // Logic for streak update
+                    // Checks if the current day of year one day after the previous day of year
+                    // and then checks if the steps target has been reached to update
+                    // the streak count. If not the resets the streak back to zero.
                     if (previousDayOfYear == currentDayOfYear - 1) {
 
                         if (targetedSteps <= previousCountedSteps) {
@@ -176,6 +188,7 @@ class MainActivity : ComponentActivity() {
                         homeViewModel.onStreaksUpdate(streakCounter)
                     }
 
+                    // Updates the values to the current ones.
                     previousTotalSteps = totalSteps
                     previousDayOfYear = currentDayOfYear
                     hydrationViewModel.onDrankAmountUpdate(0)
@@ -204,7 +217,10 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * DataStore functions for saving step counter sensor data and time
+     * Stores the values provided in preferences.
+     *
+     * @param key takes the preferences key as an argument.
+     * @param value takes the value to be stored in preferences.
      */
     private suspend fun saveData(key: String, value: Float) {
         val dataStoreKey = floatPreferencesKey(key)
@@ -213,12 +229,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Loads the value from preferences depending on the key.
+     *
+     * @param key takes the preferences key as an argument.
+     */
     private suspend fun loadData(key: String): Float? {
         val dataStoreKey = floatPreferencesKey(key)
         val preferences = dataStore.data.first()
         return preferences[dataStoreKey]
     }
 
+    /**
+     * Saves all values in preferences when the Activity is paused.
+     */
     override fun onPause() {
         super.onPause()
         lifecycleScope.launch {
@@ -242,6 +266,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Loads the data stored in preferences and when the Activity is resumed
+     * and then launches the [timerHandler] function.
+     */
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {

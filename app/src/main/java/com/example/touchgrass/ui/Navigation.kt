@@ -22,6 +22,9 @@ object Navigation {
     const val HEART_RATE_MONITOR = "heartRateMonitor"
 }
 
+/**
+ * Navigation composable with [NavHost] composable function.
+ */
 @Composable
 fun Navigation(
     stepCounterViewModel: StepCounterViewModel,

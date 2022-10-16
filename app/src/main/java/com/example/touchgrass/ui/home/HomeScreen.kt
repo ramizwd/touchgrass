@@ -23,7 +23,10 @@ object HomeConstants {
 }
 
 /**
- * Stateful Composable which manages state
+ * Stateful composable which manages state.
+ *
+ * @param navController provides navigation component.
+ * @param viewModel Home ViewModel providing LiveData for the Home screen composable.
  */
 @Composable
 fun HomeScreen(
@@ -41,7 +44,10 @@ fun HomeScreen(
 }
 
 /**
- * Composable for displaying the Home Screen
+ * Stateless composable for displaying the HomeScreen.
+ *
+ * @param currentMinutes (state) current total minutes of the day .
+ * @param streak (state) current streak count.
  */
 @Composable
 fun HomeScreenBody(

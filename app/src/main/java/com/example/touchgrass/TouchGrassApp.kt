@@ -7,8 +7,14 @@ import android.content.Context
 import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_NAME
 
+/**
+ * Application class.
+ */
 class TouchGrassApp: Application() {
-
+    /**
+     * Creates a notification channel with high importance
+     * for the steps counter service.
+     */
     override fun onCreate() {
         super.onCreate()
         val channel = NotificationChannel(
