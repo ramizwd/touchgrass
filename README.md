@@ -4,7 +4,7 @@ Touch Grass! is a sensor based Android application that tracks your steps and yo
 build using **Kotlin** programming language and the latest toolkit for building native UI; **Jetpack Compose**.
 
 ## Screenshots
-![Screenshot3](https://user-images.githubusercontent.com/63073421/196072780-4a308d28-9523-4f0b-b2f6-445970a12853.jpg)![Screenshot4](https://user-images.githubusercontent.com/63073421/196072784-5af08b94-914c-4950-93b5-8a66f5f02182.jpg)![Screenshot](https://user-images.githubusercontent.com/63073421/196072788-5a09a43f-3697-43b3-98d2-0e354035509e.jpg)
+<img src="https://user-images.githubusercontent.com/63073421/196072780-4a308d28-9523-4f0b-b2f6-445970a12853.jpg" height="500"> <img src="https://user-images.githubusercontent.com/63073421/196072784-5af08b94-914c-4950-93b5-8a66f5f02182.jpg" height="500"> <img src="https://user-images.githubusercontent.com/63073421/196072788-5a09a43f-3697-43b3-98d2-0e354035509e.jpg" height="500">
 
 ## Getting started
 - Install latest version of [Android Studio](https://developer.android.com/studio)
