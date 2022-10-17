@@ -46,7 +46,6 @@ fun HydrationScreen(
 ) {
     val hydrationTarget by hydrationViewModel.numberGoal.observeAsState()
     val waterTaken by hydrationViewModel.drankAmount.observeAsState()
-    val itemAmount by hydrationViewModel.itemsAmount.observeAsState()
 
     var expanded by remember { mutableStateOf(false) }
     var numberGoal by remember {
@@ -70,9 +69,8 @@ fun HydrationScreen(
     )
 
     HydrationScreenBody(
-        hydrationViewModel,
-        waterTaken,
-        itemAmount,
+        hydrationViewModel = hydrationViewModel,
+        waterTaken = waterTaken,
         cupSizesList = cupSizesList,
         numberGoal = numberGoal,
         onNumberGoalChange = { numberGoal = it },
@@ -88,7 +86,6 @@ fun HydrationScreen(
  * Composable for displaying the Hydration Screen
  *
  * @param waterTaken (state) amount of water consumed.
- * @param itemAmount (state) amount of cups/bottles displayed.
  * @param numberGoal (state) set target milliliters.
  * @param cupSizesList provides values (milliliters) for the cup slider.
  * @param onNumberGoalChange provides the value of clicked index from the [cupSizesList].
@@ -99,7 +96,6 @@ fun HydrationScreen(
 fun HydrationScreenBody(
     hydrationViewModel: HydrationViewModel,
     waterTaken: Int?,
-    itemAmount: Int?,
     cupSizesList: List<String>,
     numberGoal: Int,
     onNumberGoalChange: (Int) -> Unit,
@@ -111,16 +107,18 @@ fun HydrationScreenBody(
 ) {
 
     var stateSlider by remember { mutableStateOf(200f) }
+    var cupsAmount by remember { mutableStateOf(0) }
 
     // Updates the amount of cups depending on the drank amount and target amount.
-    hydrationViewModel.onItemsAmountUpdate(
-        if ((waterTaken ?: 0) < numberGoal)
-            if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) (numberGoal - (waterTaken
-                ?: 0)) / liquidAmount
-            else (numberGoal - (waterTaken
-                ?: 0)) / liquidAmount + 1
-        else 0
-    )
+    cupsAmount = if ((waterTaken ?: 0) < numberGoal) {
+        if ((numberGoal - (waterTaken ?: 0)) % liquidAmount == 0) {
+            (numberGoal - (waterTaken ?: 0)) / liquidAmount
+        } else {
+            (numberGoal - (waterTaken ?: 0)) / liquidAmount + 1
+        }
+    } else {
+        0
+    }
 
     Scaffold(
         topBar = {
@@ -246,32 +244,29 @@ fun HydrationScreenBody(
                         ),
                     ) {
                         // Check the item amount and create the cups depending on it.
-                        if (itemAmount != null) {
-                            items(itemAmount) {
-                                OutlinedButton(
-                                    onClick = {
-                                        hydrationViewModel.onDrankAmountPlus(liquidAmount)
-                                        hydrationViewModel.onItemsAmountReduce()
-                                    },
-                                    modifier = Modifier
-                                        .padding(4.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = Color.Transparent,
-                                    )
+                        items(cupsAmount) {
+                            OutlinedButton(
+                                onClick = {
+                                    hydrationViewModel.onDrankAmountPlus(liquidAmount)
+                                },
+                                modifier = Modifier
+                                    .padding(4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color.Transparent,
+                                )
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Icon(
-                                            painter = if (liquidAmount >= 800)
-                                                painterResource(R.drawable.ic_water_bottle)
-                                            else painterResource(R.drawable.ic_water_glass),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(37.dp),
-                                            tint = Color.Unspecified
-                                        )
-                                        Text(text = "$liquidAmount ml")
-                                    }
+                                    Icon(
+                                        painter = if (liquidAmount >= 800)
+                                            painterResource(R.drawable.ic_water_bottle)
+                                        else painterResource(R.drawable.ic_water_glass),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(37.dp),
+                                        tint = Color.Unspecified
+                                    )
+                                    Text(text = "$liquidAmount ml")
                                 }
                             }
                         }

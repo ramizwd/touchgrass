@@ -34,6 +34,13 @@ import com.example.touchgrass.ui.theme.SCOrange
 import com.example.touchgrass.ui.theme.SCWhite
 import com.example.touchgrass.ui.theme.SCYellow
 
+/**
+ * Stateful composable which manages state.
+ *
+ * @param navController provides navigation component.
+ * @param bluetoothAdapter provides ifo about the BLE sensor.
+ * @param viewModel ViewModel providing LiveData for the HeartRateMonitor screen composable.
+ */
 @Composable
 fun HeartRateMonitorScreen(
     viewModel: HeartRateMonitorViewModel,
@@ -44,8 +51,6 @@ fun HeartRateMonitorScreen(
     val bpm by viewModel.mBPM.observeAsState()
     val writing by viewModel.writing.observeAsState()
     val isConnected by viewModel.gattConnection.observeAsState()
-
-    val heartRate by viewModel.heartRateData.observeAsState()
     val seconds by viewModel.secondsData.observeAsState()
 
     val gattClientCallback = GattClientCallback(viewModel)
@@ -57,13 +62,22 @@ fun HeartRateMonitorScreen(
         bpm = bpm,
         writing = writing,
         isConnected = isConnected,
-        heartRate = heartRate,
         seconds = seconds,
         gattClientCallback = gattClientCallback,
         navController = navController,
     )
 }
 
+/**
+ * Stateless composable for displaying the HomeScreen.
+ *
+ * @param btScanning checks if BLE is scanning for devices.
+ * @param bpm provides the current hear rate read.
+ * @param writing checks if devices is connected and reading new data from it.
+ * @param isConnected checks if the phone is connected to the BLE device.
+ * @param seconds value that increase each time new [bpm] updates.
+ * @param gattClientCallback for scanning and connecting to BLE device.
+ */
 @Composable
 fun HeartRateMonitorBody(
     viewModel: HeartRateMonitorViewModel,
@@ -72,7 +86,6 @@ fun HeartRateMonitorBody(
     bpm: Int?,
     writing: Boolean?,
     isConnected: Boolean?,
-    heartRate: Float?,
     seconds: Float?,
     gattClientCallback: GattClientCallback,
     navController: NavController,
@@ -91,6 +104,7 @@ fun HeartRateMonitorBody(
         result = results
     }
 
+    // Asks for location permission.
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         requestPermissions(
             context as Activity,
@@ -132,17 +146,22 @@ fun HeartRateMonitorBody(
                                 .selectable(
                                     selected = true,
                                     onClick = {
+                                        // Checks if the device support BLE or if BT is enabled.
                                         if (bluetoothAdapter == null) {
                                             Toast
                                                 .makeText(
                                                     context,
-                                                    context.getString(R.string.device_does_not_support_bt),
+                                                    context.getString(
+                                                        R.string.device_does_not_support_bt
+                                                    ),
                                                     Toast.LENGTH_LONG
                                                 )
                                                 .show()
                                         }
                                         if (bluetoothAdapter?.isEnabled == true) {
-                                            viewModel.scanDevices(bluetoothAdapter.bluetoothLeScanner)
+                                            viewModel.scanDevices(
+                                                bluetoothAdapter.bluetoothLeScanner
+                                            )
                                             viewModel.onWritingUpdate(false)
                                         } else {
                                             Toast
@@ -203,11 +222,11 @@ fun HeartRateMonitorBody(
                     .weight(1f)
             ) {
                 Column {
-                    if ((result != null) && (writing == false)) {
-                        if (!btScanning) {
-                            if (result.isEmpty()) {
-                                Text(text = stringResource(R.string.no_devices_found_bt))
-                            }
+                    // Displays the list of devices if found, else displays devices not found text.
+                    // if the writing is true then shows the graph composable and hides the list.
+                    if (result != null && writing == false) {
+                        if (!btScanning && result.isEmpty()) {
+                            Text(text = stringResource(R.string.no_devices_found_bt))
                         }
                         LazyColumn(
                             modifier = Modifier
@@ -228,7 +247,9 @@ fun HeartRateMonitorBody(
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.ic_bluetooth),
-                                                contentDescription = stringResource(R.string.bluetooth_ic_desc)
+                                                contentDescription = stringResource(
+                                                    R.string.bluetooth_ic_desc
+                                                )
                                             )
                                             Spacer(Modifier.width(10.dp))
                                             Text(
@@ -242,7 +263,7 @@ fun HeartRateMonitorBody(
                             }
                         }
                     } else {
-                        HeartRateGraph(heartRate, seconds)
+                        HeartRateGraph(bpm?.toFloat(), seconds)
                     }
                 }
             }

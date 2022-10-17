@@ -19,7 +19,7 @@ import com.example.touchgrass.utils.Constants.ACTION_START_SERVICE
 import com.example.touchgrass.utils.Constants.ACTION_STOP_SERVICE
 import com.example.touchgrass.utils.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.touchgrass.utils.Constants.NOTIFICATION_ID
-import com.example.touchgrass.utils.Constants.SENSOR_STEPS_TAG
+import com.example.touchgrass.utils.Constants.STEPS_SENSOR_TAG
 
 /**
  * Foreground service class with SensorEventListener for the steps counter sensor.
@@ -115,7 +115,7 @@ class StepCounterService: Service(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
         event.values.firstOrNull()?.let {
-            Log.d(SENSOR_STEPS_TAG, "Count: $it")
+            Log.d(STEPS_SENSOR_TAG, "Count: $it")
             totalSteps = it
         }
     }
