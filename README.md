@@ -15,4 +15,4 @@ build using **Kotlin** programming language and the latest toolkit for building 
 > **Note:** If you want to use the step counter sensor use a physical phone.
 
 ## License
-[AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
