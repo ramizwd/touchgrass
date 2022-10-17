@@ -200,7 +200,7 @@ fun HeartRateMonitorBody(
                         verticalArrangement = Arrangement.Center
                     ) {
                         CircularProgressBar(
-                            value = (bpm ?: 0) / 120.toFloat(),
+                            value = (bpm ?: 0) / 120f,
                             target = 120,
                             isHeartRateScreen = true,
                             foregroundColor =
