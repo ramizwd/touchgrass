@@ -9,13 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.touchgrass.R
 import com.example.touchgrass.service.StepCounterService.Companion.isSensorOn
 import com.example.touchgrass.ui.shared.components.CircularProgressBar
+import com.example.touchgrass.ui.theme.SCYellow
 
 /**
  * Stateful composable which manages state.
@@ -125,10 +125,11 @@ fun StepCounterScreenBody(
                     CircularProgressBar(
                         value = (steps ?: 0) / stepsTarget,
                         target = stepsTarget.toInt(),
+                        isStepCounterScreen = true,
                         foregroundColor = if ((steps ?: 0) >= stepsTarget)
                             MaterialTheme.colors.primary
                         else
-                            Color(0xFFDDFC74),
+                            SCYellow,
                         isSensorOn = isSensorOn,
                     )
                 }

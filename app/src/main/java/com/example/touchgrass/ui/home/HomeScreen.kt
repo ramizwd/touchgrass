@@ -11,6 +11,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -80,7 +82,7 @@ fun HomeScreenBody(
                 ) {
                     CircularProgressBar(
                         value = (currentMinutes ?: 0) / HomeConstants.TOTAL_MINUTES_OF_DAY,
-                        target = 0,
+                        isHomeScreen = true,
                         streak = streak
                     )
                 }
@@ -112,6 +114,15 @@ fun HomeScreenBody(
                             text = stringResource(R.string.step_counter),
                             modifier = Modifier.padding(8.dp)
                         )
+                        Icon(
+                            painter = painterResource(R.drawable.ic_step),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(32.dp)
+                                .padding(5.dp)
+                        )
                     }
                     Box(
                         contentAlignment = Alignment.Center,
@@ -125,7 +136,17 @@ fun HomeScreenBody(
                     ) {
                         Text(
                             text = stringResource(R.string.hydration),
-                            modifier = Modifier.padding(8.dp))
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.ic_water_glass),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(32.dp)
+                                .padding(5.dp)
+                        )
 
                     }
                     Box(
@@ -142,6 +163,15 @@ fun HomeScreenBody(
                         Text(
                             text = stringResource(R.string.hr_monitor),
                             modifier = Modifier.padding(8.dp)
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.ic_hr),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(32.dp)
+                                .padding(5.dp)
                         )
                     }
                 }

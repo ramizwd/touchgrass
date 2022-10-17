@@ -17,12 +17,16 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 
+/**
+ * Heart rate monitor graph composable.
+ */
 @Composable
 fun HeartRateGraph(hr: Float?, sec: Float?) {
 
-    val dataSets = remember { mutableStateListOf<Entry>() }
+    // add new Entry to dataSet each time a new hr value updates.
+    val dataSet = remember { mutableStateListOf<Entry>() }
     if (hr != null && hr != 0f) {
-        dataSets.add(Entry(sec ?: 0f, hr))
+        dataSet.add(Entry(sec ?: 0f, hr))
     }
 
     val label = "Beats Per Minute"
@@ -39,12 +43,12 @@ fun HeartRateGraph(hr: Float?, sec: Float?) {
         update = { lineChart ->
             var lineData: LineData? = null
 
-            if (dataSets.isNotEmpty()) {
-                val lineDataSet = LineDataSet(dataSets, label).apply {
+            if (dataSet.isNotEmpty()) {
+                val lineDataSet = LineDataSet(dataSet, label).apply {
                     color = lineColor
                     isHighlightEnabled = true
-//                    lineWidth = 2f
-//                    mode = LineDataSet.Mode.CUBIC_BEZIER
+                    lineWidth = 2f
+                    mode = LineDataSet.Mode.CUBIC_BEZIER
                     setDrawValues(false)
                     setDrawCircles(false)
                     setDrawHighlightIndicators(false)

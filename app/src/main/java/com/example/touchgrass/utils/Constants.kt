@@ -11,7 +11,8 @@ object Constants {
     const val NOTIFICATION_CHANNEL_NAME = "Steps"
 
     // Tags
-    const val SENSOR_STEPS_TAG = "StepCounter"
+    const val STEPS_SENSOR_TAG = "StepCounter"
+    const val BLE_TAG = "BTDebug"
 
     // Preferences DataStore
     const val STEPS_PREFERENCES = "steps"
