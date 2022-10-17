@@ -7,15 +7,21 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.example.touchgrass.ui.heartratemonitor.HeartRateMonitorViewModel
+import com.example.touchgrass.utils.Constants.BLE_TAG
 import java.util.*
 
-class GattClientCallback(model: HeartRateMonitorViewModel) : BluetoothGattCallback() {
+/**
+ * GATT client class that connects to the GATT server.
+ */
+class GattClientCallback(model: HeartRateMonitorViewModel): BluetoothGattCallback() {
     companion object {
         val HEART_RATE_SERVICE_UUID = convertFromInteger(0x180D)
         val HEART_RATE_MEASUREMENT_CHAR_UUID = convertFromInteger(0x2A37)
         val CLIENT_CHARACTERISTIC_CONFIG_UUID = convertFromInteger(0x2902)
-        private const val TAG = "BTDebug"
 
+        /**
+         * Converts integers to the full UUIDs.
+         */
         private fun convertFromInteger(i: Int): UUID {
             val msb = 0x0000000000001000L
             val lsb = -0x7fffff7fa064cb05L
@@ -27,45 +33,51 @@ class GattClientCallback(model: HeartRateMonitorViewModel) : BluetoothGattCallba
     private val viewModel = model
     private var sec = 0f
 
+    /**
+     * If the connection is established this function with STATE_CONNECTED is called.
+     */
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
         if (status == BluetoothGatt.GATT_FAILURE) {
-            Log.d(TAG, "GATT connection failure")
+            Log.d(BLE_TAG, "GATT connection failure")
             return
         } else if (status == BluetoothGatt.GATT_SUCCESS) {
-            Log.d(TAG, "GATT connection success")
+            Log.d(BLE_TAG, "GATT connection success")
             return
         }
         if (newState == BluetoothProfile.STATE_CONNECTED) {
-            Log.d(TAG, "Connected GATT service")
+            Log.d(BLE_TAG, "Connected GATT service")
             try {
                 viewModel.onGattConnUpdate(gatt.discoverServices())
-                Log.d(TAG, "Connected GATT service try-catch")
+                Log.d(BLE_TAG, "Connected GATT service try-catch")
             } catch (e: SecurityException) {
-                Log.d(TAG, "SecurityException")
+                Log.d(BLE_TAG, "SecurityException")
             }
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-            Log.d(TAG, "Disconnected GATT service")
+            Log.d(BLE_TAG, "Disconnected GATT service")
             viewModel.onGattConnUpdate(false)
         }
     }
 
+    /**
+     * Invoked when a new services have been discovered.
+     */
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
         super.onServicesDiscovered(gatt, status)
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            Log.d(TAG, "not successful")
+            Log.d(BLE_TAG, "not successful")
             return
         }
 
-        Log.d(TAG, "onServicesDiscovered")
+        Log.d(BLE_TAG, "onServicesDiscovered")
         for (gattService in gatt.services) {
-            Log.d(TAG, "$gattService")
+            Log.d(BLE_TAG, "$gattService")
 
             if (gattService.uuid == HEART_RATE_SERVICE_UUID) {
-                Log.d(TAG, "Heart Rate Service found")
+                Log.d(BLE_TAG, "Heart Rate Service found")
 
                 for (gattCharacteristic in gattService.characteristics)
-                    Log.d(TAG, "Characteristic ${gattCharacteristic.uuid}")
+                    Log.d(BLE_TAG, "Characteristic ${gattCharacteristic.uuid}")
 
                 try {
                     val characteristic = gatt.getService(HEART_RATE_SERVICE_UUID)
@@ -80,7 +92,7 @@ class GattClientCallback(model: HeartRateMonitorViewModel) : BluetoothGattCallba
                         viewModel.onWritingUpdate(writing)
                     }
                 } catch (e: SecurityException) {
-                    Log.d(TAG, "SecurityException")
+                    Log.d(BLE_TAG, "SecurityException")
                 }
             }
         }
@@ -91,21 +103,26 @@ class GattClientCallback(model: HeartRateMonitorViewModel) : BluetoothGattCallba
         descriptor: BluetoothGattDescriptor?,
         status: Int
     ) {
-        Log.d(TAG, "onDescriptorWrite")
+        Log.d(BLE_TAG, "onDescriptorWrite")
     }
 
+    /**
+     * Updates the LiveData in the ViewModel each time the characteristic's content changes.
+     */
     override fun onCharacteristicChanged(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic
     ) {
         val bpm = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)
-        Log.d(TAG, "BPM: $bpm")
+        Log.d(BLE_TAG, "BPM: $bpm")
         viewModel.onBPMUpdate(bpm)
-        viewModel.onHeartRateUpdate(bpm.toFloat())
         viewModel.onSecondsUpdate(sec++)
 
     }
 
+    /**
+     * Makes a connection to the BLE device.
+     */
     fun connectToHRMonitor(device: BluetoothDevice, context: Context) {
         val connectGatt = device.connectGatt(context, false, this@GattClientCallback)
 

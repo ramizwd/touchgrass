@@ -28,7 +28,25 @@ import com.example.touchgrass.service.StepCounterServiceHelper
 import com.example.touchgrass.utils.Constants
 
 /**
+ * Shared custom CircularProgressbar.
  *
+ * @param value is the current value provided for the circle.
+ * @param target the maximum value of the circle.
+ * @param fontSize font size of the value of the circle.
+ * @param radius radius of the foreground and background arc.
+ * @param foregroundColor the color of the foreground arc.
+ * @param foregroundColor the color of the background arc.
+ * @param strokeWidth thickness of the arc.
+ * @param animationDuration animation of the arc.
+ * @param animationDelay animation delay of the arc.
+ * @param streak streak count for the Home screen circle.
+ * @param isSensorOn used for the FloatingActionButton service toggle.
+ * @param writing used to check if reading data from a BLE device.
+ * @param isConnected for checking if the phone is connected to a BLE device.
+ * @param isHydrationScreen for displaying the right progress circle info for the right screen.
+ * @param isHeartRateScreen for displaying the right progress circle info for the right screen.
+ * @param isStepCounterScreen for displaying the right progress circle info for the right screen.
+ * @param isHomeScreen for displaying the right progress circle info for the right screen.
  */
 @Composable
 fun CircularProgressBar(
@@ -41,8 +59,8 @@ fun CircularProgressBar(
     strokeWidth: Dp = 22.dp,
     animationDuration: Int = 1000,
     animationDelay: Int = 0,
-    isSensorOn: Boolean = false,
     streak: Float? = 0f,
+    isSensorOn: Boolean = false,
     writing: Boolean = false,
     isConnected: Boolean = false,
     isHydrationScreen: Boolean = false,
@@ -93,6 +111,7 @@ fun CircularProgressBar(
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
         }
+        // Displaying the right circle information depending on the screen.
         if(isHydrationScreen) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -110,7 +129,7 @@ fun CircularProgressBar(
                 )
             }
         }
-        if (isHeartRateScreen) {
+        else if (isHeartRateScreen) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -135,7 +154,7 @@ fun CircularProgressBar(
                     .align(Alignment.BottomCenter),
             )
         }
-        if (isStepCounterScreen) {
+        else if (isStepCounterScreen) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -179,7 +198,7 @@ fun CircularProgressBar(
                 )
             }
         }
-        if (isHomeScreen) {
+        else if (isHomeScreen) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
